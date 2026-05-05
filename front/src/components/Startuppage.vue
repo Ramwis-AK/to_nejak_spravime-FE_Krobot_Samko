@@ -2,7 +2,7 @@
   <div class="page-content">
     <div class="list-page">
       <div class="list-header">
-        <h1>StartUp <span class="badge">Program A</span></h1>
+        <h1>StartUp</h1>
         <p>Grantový inkubačný program — vlastný inovatívny nápad, financovanie a mentoring.</p>
       </div>
 
@@ -68,7 +68,6 @@ export default {
 
 .list-header { margin-bottom: 2.5rem; }
 .list-header h1 { font-size: 2rem; font-weight: normal; color: var(--navy); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
-.badge { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; background: var(--accent); color: var(--navy); padding: 0.25rem 0.6rem; border-radius: 3px; font-weight: bold; vertical-align: middle; }
 .list-header p { color: var(--text-muted); font-size: 0.95rem; }
 
 .table-wrap { overflow-x: auto; }

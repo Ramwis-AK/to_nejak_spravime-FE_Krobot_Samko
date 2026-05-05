@@ -1,35 +1,441 @@
 @import './base.css';
 
+/* ── Reset Vue default šablóny ── */
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: none;
+  margin: 0;
+  padding: 0;
   font-weight: normal;
 }
 
-a,
-.green {
+/* ── CSS premenné ── */
+:root {
+  --navy: #0a1628;
+  --navy-light: #152240;
+  --accent: #e8b84b;
+  --accent-dim: #c99d35;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --surface: #f9fafb;
+  --white: #ffffff;
+  --navbar-h: 64px;
+}
+
+body {
+  font-family: 'Georgia', serif;
+  background: var(--white);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Navbar ── */
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--navbar-h);
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3rem;
+  z-index: 1000;
+  border-bottom: 2px solid var(--accent);
+}
+
+.nav-logo {
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: #c8d0e0;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.nav-links a:hover,
+.nav-links a.router-link-active {
+  color: var(--white);
+  background: var(--navy-light);
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+.nav-links a.nav-cta {
+  background: var(--accent);
+  color: var(--navy);
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.nav-links a.nav-cta:hover {
+  background: var(--accent-dim);
+  color: var(--navy);
+}
+
+/* ── Page wrapper ── */
+.page-content {
+  padding-top: var(--navbar-h);
+}
+
+/* ── Footer ── */
+.footer {
+  background: var(--navy);
+  color: #6b7e99;
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  border-top: 1px solid #1e3050;
+}
+
+/* ── Hero (HomeView) ── */
+.hero {
+  background: var(--navy);
+  min-height: 70vh;
+  max-width: 80%;
+  margin-left: 10%;
+  display: flex;
+  /*align-items: center;*/
+}
+
+.hero-inner {
+  max-width: 1000px;
+  margin: 0;
+  padding: 6rem 9rem;
+}
+
+.hero-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.1;
+  color: var(--white);
+  margin-bottom: 1.5rem;
+  font-weight: normal;
+}
+
+.gold { color: var(--accent); }
+
+.hero-sub {
+  font-size: 1.1rem;
+  color: #8da0bc;
+  margin-bottom: 2.5rem;
+  max-width: 800px;
+  line-height: 1.6;
+}
+
+.btn-primary {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--navy);
+  border: none;
+  padding: 0.9rem 2.2rem;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 3px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: var(--accent-dim); }
+
+/* ── Stats ── */
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 4rem;
+}
+
+.stat-num {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 60px;
+  background: var(--border);
+}
+
+/* ── About ── */
+.about {
+  padding: 5rem 3rem;
+  background: var(--surface);
+}
+
+.about-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 4rem;
+  align-items: start;
+}
+
+.about-text h2 {
+  font-size: 2rem;
+  color: var(--navy);
+  margin-bottom: 1.5rem;
+  font-weight: normal;
+  border-left: 3px solid var(--accent);
+  padding-left: 1rem;
+}
+
+.about-text p {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.contact-box {
+  background: var(--navy);
+  color: var(--white);
+  padding: 2rem;
+  border-radius: 4px;
+}
+
+.contact-box h3 {
+  color: var(--accent);
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  font-weight: normal;
+}
+
+.contact-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #c8d0e0;
+  line-height: 1.4;
+}
+
+.contact-icon {
+  color: var(--accent);
+  font-size: 0.85rem;
+  min-width: 16px;
+  margin-top: 1px;
+}
+
+/* ── Zoznam (Startup / Prax) ── */
+.list-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  min-height: calc(100vh - var(--navbar-h) - 60px);
+}
+
+.list-header { margin-bottom: 2.5rem; }
+
+.list-header h1 {
+  font-size: 2rem;
+  font-weight: normal;
+  color: var(--navy);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.list-header p { color: var(--text-muted); font-size: 0.95rem; }
+
+.table-wrap { overflow-x: auto; }
+
+.list-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.list-table thead tr { border-bottom: 2px solid var(--navy); }
+.list-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: normal;
+  white-space: nowrap;
+}
+.list-table td { padding: 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.list-table tbody tr:hover { background: var(--surface); }
+
+.td-name { font-weight: bold; color: var(--navy); }
+.td-vp { color: #374151; max-width: 260px; }
+.td-inv { font-family: monospace; font-size: 0.85rem; color: var(--navy); white-space: nowrap; }
+
+/* ── Tagy ── */
+.tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  background: #f3f4f6;
+  color: #374151;
+}
+.tag-area { background: #e8f0fe; color: #1e40af; }
+.tag-faza.seed { background: #ecfdf5; color: #065f46; }
+.tag-faza.series-a { background: #eff6ff; color: #1e40af; }
+.tag-faza.pre-seed { background: #fefce8; color: #854d0e; }
+.tag-stav.open { background: #ecfdf5; color: #065f46; }
+.tag-stav.pairing { background: #fefce8; color: #854d0e; }
+.tag-stav.active { background: #eff6ff; color: #1e40af; }
+
+/* ── Detail tlačidlo ── */
+.btn-detail {
+  display: inline-block;
+  background: var(--navy);
+  color: var(--white);
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+  border-radius: 3px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.btn-detail:hover { background: var(--navy-light); }
+
+/* ── Detail stránka ── */
+.detail-page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  min-height: calc(100vh - var(--navbar-h) - 60px);
+}
+
+.back-btn {
+  display: inline-block;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: var(--navy); }
+
+.detail-page h1 {
+  font-size: 2rem;
+  font-weight: normal;
+  color: var(--navy);
+  margin-bottom: 1rem;
+}
+
+.detail-tags { display: flex; gap: 0.5rem; margin-bottom: 2rem; }
+
+.detail-card {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.detail-row {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.detail-row:last-child { border-bottom: none; }
+
+.dl { color: var(--text-muted); min-width: 160px; font-size: 0.85rem; }
+
+.placeholder-note { color: var(--text-muted); font-size: 0.85rem; font-style: italic; }
+
+/* ── Registrácia ── */
+.reg-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  min-height: calc(100vh - var(--navbar-h) - 60px);
+}
+
+.reg-header { margin-bottom: 2.5rem; }
+.reg-header h1 { font-size: 2rem; font-weight: normal; color: var(--navy); margin-bottom: 0.5rem; }
+.reg-header p { color: var(--text-muted); }
+
+.roles-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.role-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.role-btn:hover {
+  border-color: var(--navy);
+  background: var(--surface);
+  transform: translateX(4px);
+}
+
+.role-left { display: flex; flex-direction: column; gap: 0.2rem; }
+.role-name { font-size: 1rem; font-weight: bold; color: var(--navy); }
+.role-desc { font-size: 0.85rem; color: var(--text-muted); }
+.role-arrow { color: var(--accent); font-size: 1.2rem; }
+
+/* ── Registrácia formulár ── */
+.form-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  min-height: calc(100vh - var(--navbar-h) - 60px);
+}
+
+.form-page h1 { font-size: 2rem; font-weight: normal; color: var(--navy); margin-bottom: 0.5rem; }
+.form-page .role-desc { color: var(--text-muted); margin-bottom: 2rem; }
+
+.form-placeholder {
+  border: 2px dashed var(--border);
+  border-radius: 4px;
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }

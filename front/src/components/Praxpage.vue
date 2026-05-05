@@ -2,7 +2,7 @@
   <div class="page-content">
     <div class="list-page">
       <div class="list-header">
-        <h1>Prax <span class="badge">Program B</span></h1>
+        <h1>Prax</h1>
         <p>Program živej praxe — reálne zadania od firiem, odmena a skúsenosť tímu.</p>
       </div>
 
@@ -67,7 +67,6 @@ export default {
 .list-page { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; min-height: calc(100vh - var(--navbar-h) - 60px); }
 .list-header { margin-bottom: 2.5rem; }
 .list-header h1 { font-size: 2rem; font-weight: normal; color: var(--navy); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
-.badge { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; background: var(--navy); color: var(--accent); border: 1px solid var(--accent); padding: 0.25rem 0.6rem; border-radius: 3px; font-weight: bold; vertical-align: middle; }
 .list-header p { color: var(--text-muted); font-size: 0.95rem; }
 
 .table-wrap { overflow-x: auto; }

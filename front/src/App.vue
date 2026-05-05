@@ -4,8 +4,8 @@
       <div class="nav-logo">NTI</div>
       <div class="nav-links">
         <RouterLink to="/">Domov</RouterLink>
-        <RouterLink to="/startup">StartUp (A)</RouterLink>
-        <RouterLink to="/prax">Prax (B)</RouterLink>
+        <RouterLink to="/startup">StartUp</RouterLink>
+        <RouterLink to="/prax">Prax</RouterLink>
         <RouterLink to="/registracia" class="nav-cta">Registrácia</RouterLink>
       </div>
     </nav>

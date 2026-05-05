@@ -29,12 +29,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.form-page { max-width: 600px; margin: 0 auto; padding: 3rem 2rem; min-height: calc(100vh - var(--navbar-h) - 60px); }
-.back-btn { display: inline-block; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; text-decoration: none; }
-.back-btn:hover { color: var(--navy); }
-h1 { font-size: 2rem; font-weight: normal; color: var(--navy); margin-bottom: 0.5rem; }
-.role-desc { color: var(--text-muted); margin-bottom: 2rem; }
-.form-placeholder { border: 2px dashed var(--border); border-radius: 4px; padding: 3rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
-</style>
