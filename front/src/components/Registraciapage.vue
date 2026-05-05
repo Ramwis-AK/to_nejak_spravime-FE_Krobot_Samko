@@ -35,14 +35,14 @@ export default {
   data() {
     return {
       roles: [
-        { key: 'student', name: 'Študent', desc: 'Jednotlivec uchádzajúci sa o program alebo člen tímu' },
-        { key: 'vedouci', name: 'Vedúci tímu', desc: 'Študent s právom správy tímu' },
-        { key: 'firma', name: 'Firma / partner', desc: 'Organizácia zadávajúca výzvu alebo vstupujúca do programu B' },
-        { key: 'mentor', name: 'Mentor', desc: 'Osoba sprevádzajúca projekt alebo tím' },
-        { key: 'komisia', name: 'Komisia / evaluator', desc: 'Hodnotiteľ prihlášok' },
-        { key: 'editor', name: 'Editor obsahu', desc: 'Správca verejného obsahu' },
-        { key: 'nti-admin', name: 'NTI administrátor', desc: 'Prevádzkový správca programu' },
-        { key: 'super-admin', name: 'Super administrátor', desc: 'Technicko-prevádzková rola' },
+      { key: 'student', name: 'Študent', desc: 'Jednotlivec uchádzajúci sa o prax alebo prácu v StartUpe' },
+      { key: 'vedouci', name: 'Vedúci tímu', desc: 'Jednotlivec s právom správy tímu alebo zakladajúci StartUp' },
+      { key: 'firma', name: 'Firma / partner', desc: 'Organizácia zadávajúca výzvu pre prax alebo zakladajúca StartUp' },
+      { key: 'mentor', name: 'Mentor', desc: 'Osoba sprevádzajúca projekt alebo tím' },
+      { key: 'komisia', name: 'Komisia / evaluator', desc: 'Hodnotiteľ prihlášok' },
+      { key: 'editor', name: 'Editor obsahu', desc: 'Správca verejného obsahu' },
+      { key: 'nti-admin', name: 'NTI administrátor', desc: 'Prevádzkový správca programu' },
+      { key: 'super-admin', name: 'Super administrátor', desc: 'Technicko-prevádzková rola' },
       ]
     }
   }

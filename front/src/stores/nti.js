@@ -20,9 +20,9 @@ export const useNtiStore = defineStore('nti', {
       { id: 4, firma: 'MedCenter SK', sektor: 'HealthTech', stav: 'Otvorené', stavKey: 'open', lokalita: 'Nitra', zadanie: 'Systém spracovania lekárskych dát', odmena: '€3 500 / tím' },
     ],
     roles: [
-      { key: 'student', name: 'Študent', desc: 'Jednotlivec uchádzajúci sa o program alebo člen tímu' },
-      { key: 'vedouci', name: 'Vedúci tímu', desc: 'Študent s právom správy tímu' },
-      { key: 'firma', name: 'Firma / partner', desc: 'Organizácia zadávajúca výzvu alebo vstupujúca do programu B' },
+      { key: 'student', name: 'Študent', desc: 'Jednotlivec uchádzajúci sa o prax alebo prácu v StartUpe' },
+      { key: 'vedouci', name: 'Vedúci tímu', desc: 'Jednotlivec s právom správy tímu alebo zakladajúci StartUp' },
+      { key: 'firma', name: 'Firma / partner', desc: 'Organizácia zadávajúca výzvu pre prax alebo zakladajúca StartUp' },
       { key: 'mentor', name: 'Mentor', desc: 'Osoba sprevádzajúca projekt alebo tím' },
       { key: 'komisia', name: 'Komisia / evaluator', desc: 'Hodnotiteľ prihlášok' },
       { key: 'editor', name: 'Editor obsahu', desc: 'Správca verejného obsahu' },
