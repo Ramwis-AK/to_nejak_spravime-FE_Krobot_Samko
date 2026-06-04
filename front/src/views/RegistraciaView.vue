@@ -3,7 +3,7 @@
     <div class="reg-page">
       <div class="reg-header">
         <h1>Registrácia</h1>
-        <p>Vyber typ účtu, ktorý chceš vytvoriť.</p>
+        <p>Vyber typ účtu, ktorý chceš vytvoriť v systéme NTI.</p>
       </div>
       <div class="roles-list">
         <RouterLink
@@ -20,14 +20,16 @@
         </RouterLink>
       </div>
     </div>
-    <footer class="footer">© 2026 Nitriansky technologický inkubátor. Všetky práva vyhradené.</footer>
+    <AppFooter />
   </div>
 </template>
 
 <script>
 import { useNtiStore } from '../stores/nti.js'
+import AppFooter from '../components/AppFooter.vue'
 export default {
   name: 'RegistraciaView',
+  components: { AppFooter },
   setup() { return { store: useNtiStore() } }
 }
 </script>

@@ -1,39 +1,74 @@
 <template>
   <div class="page-content">
+    <PageHero
+      label="Program B"
+      title="Živá prax"
+      sub="Reálne zadania od firiem — odmena pre tím, Product Owner a mentor NTI."
+    />
     <div class="list-page">
-      <div class="list-header">
-        <h1>Prax</h1>
-        <p>Program živej praxe — reálne zadania od firiem, odmena a skúsenosť tímu.</p>
-      </div>
-      <div class="table-wrap">
-        <table class="list-table">
-          <thead>
-            <tr>
-              <th>Firma</th><th>Sektor</th><th>Stav</th><th>Lokalita</th><th>Zadanie</th><th>Odmena tímu</th><th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="p in store.praxe" :key="p.id">
-              <td class="td-name">{{ p.firma }}</td>
-              <td><span class="tag tag-area">{{ p.sektor }}</span></td>
-              <td><span :class="['tag', 'tag-stav', p.stavKey]">{{ p.stav }}</span></td>
-              <td>{{ p.lokalita }}</td>
-              <td class="td-vp">{{ p.zadanie }}</td>
-              <td class="td-inv">{{ p.odmena }}</td>
-              <td><RouterLink :to="`/prax/${p.id}`" class="btn-detail">Detail →</RouterLink></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <FilterBar
+        v-model="activeFilter"
+        v-model:search="search"
+        :filters="stavFilter"
+        placeholder="Hľadať zadanie alebo firmu..."
+      />
+      <DataTable :columns="cols" :rows="filtered" detailPath="/prax">
+        <template #cell-sektor="{ value }">
+          <span class="tag tag-area">{{ value }}</span>
+        </template>
+        <template #cell-stav="{ row, value }">
+          <span :class="['tag','tag-stav', row.stavKey]">{{ value }}</span>
+        </template>
+        <template #cell-zadanie="{ value }">
+          <span class="td-vp">{{ value }}</span>
+        </template>
+        <template #cell-odmena="{ value }">
+          <span class="td-inv">{{ value }}</span>
+        </template>
+      </DataTable>
     </div>
-    <footer class="footer">© 2026 Nitriansky technologický inkubátor. Všetky práva vyhradené.</footer>
+    <AppFooter />
   </div>
 </template>
 
 <script>
+import { ref, computed } from 'vue'
 import { useNtiStore } from '../stores/nti.js'
+import AppFooter from '../components/AppFooter.vue'
+import PageHero from '../components/PageHero.vue'
+import FilterBar from '../components/FilterBar.vue'
+import DataTable from '../components/DataTable.vue'
 export default {
   name: 'PraxView',
-  setup() { return { store: useNtiStore() } }
+  components: { AppFooter, PageHero, FilterBar, DataTable },
+  setup() {
+    const store = useNtiStore()
+    const search = ref('')
+    const activeFilter = ref('all')
+    const stavFilter = [
+      { key: 'all', label: 'Všetky' },
+      { key: 'open', label: 'Otvorené' },
+      { key: 'pairing', label: 'Párovanie' },
+      { key: 'active', label: 'V realizácii' },
+    ]
+    const cols = [
+      { key: 'firma', label: 'Firma', class: () => 'td-name' },
+      { key: 'sektor', label: 'Sektor' },
+      { key: 'stav', label: 'Stav' },
+      { key: 'lokalita', label: 'Lokalita' },
+      { key: 'zadanie', label: 'Zadanie' },
+      { key: 'odmena', label: 'Odmena tímu' },
+    ]
+    const filtered = computed(() => {
+      let list = store.praxe
+      if (activeFilter.value !== 'all') list = list.filter(p => p.stavKey === activeFilter.value)
+      if (search.value) list = list.filter(p =>
+        p.firma.toLowerCase().includes(search.value.toLowerCase()) ||
+        p.zadanie.toLowerCase().includes(search.value.toLowerCase())
+      )
+      return list
+    })
+    return { store, search, activeFilter, stavFilter, cols, filtered }
+  }
 }
 </script>
