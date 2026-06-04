@@ -7,10 +7,9 @@
       </div>
       <div class="footer-col">
         <h4>Programy</h4>
-        <RouterLink to="/program-a">Program A — Startup</RouterLink>
-        <RouterLink to="/program-b">Program B — Prax</RouterLink>
+        <RouterLink to="/startup">Program A — Startup</RouterLink>
+        <RouterLink to="/prax">Program B — Prax</RouterLink>
         <RouterLink to="/vyzvy">Výzvy a termíny</RouterLink>
-        <RouterLink to="/startup">Inkubované startupy</RouterLink>
       </div>
       <div class="footer-col">
         <h4>Komunita</h4>

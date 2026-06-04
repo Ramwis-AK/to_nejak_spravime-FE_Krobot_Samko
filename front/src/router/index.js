@@ -6,7 +6,7 @@ const router = createRouter({
   scrollBehavior() { return { top: 0 } },
   routes: [
     { path: '/', name: 'home', component: HomeView },
-    { path: '/o-nti', name: 'o-nti', component: () => import('../views/OntiView.vue') },
+    { path: '/o-nti', name: 'o-nti', component: () => import('../views/ONtiView.vue') },
     { path: '/startup', name: 'startup', component: () => import('../views/StartupView.vue') },
     { path: '/startup/:id', name: 'startup-detail', component: () => import('../views/StartupdetailView.vue') },
     { path: '/prax', name: 'prax', component: () => import('../views/PraxView.vue') },

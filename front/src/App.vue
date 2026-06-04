@@ -5,8 +5,8 @@
       <div class="nav-links" :class="{ open: menuOpen }">
         <RouterLink to="/" @click="menuOpen = false">Domov</RouterLink>
         <RouterLink to="/o-nti" @click="menuOpen = false">O NTI</RouterLink>
-        <RouterLink to="/program-a" @click="menuOpen = false">Program A</RouterLink>
-        <RouterLink to="/program-b" @click="menuOpen = false">Program B</RouterLink>
+        <RouterLink to="/startup" @click="menuOpen = false">Program A</RouterLink>
+        <RouterLink to="/prax" @click="menuOpen = false">Program B</RouterLink>
         <RouterLink to="/partneri" @click="menuOpen = false">Partneri</RouterLink>
         <RouterLink to="/vyzvy" @click="menuOpen = false">Výzvy</RouterLink>
         <RouterLink to="/novinky" @click="menuOpen = false">Novinky</RouterLink>

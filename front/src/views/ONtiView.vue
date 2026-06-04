@@ -52,7 +52,7 @@
               <li>Tím min. 3 členov</li>
               <li>Kvartálne hodnotenie</li>
             </ul>
-            <RouterLink to="/program-a" class="btn-primary">Viac o Programme A →</RouterLink>
+            <RouterLink to="/startup" class="btn-primary">Viac o Programme A →</RouterLink>
           </div>
           <div class="program-box program-b">
             <div class="program-box-header">
@@ -66,7 +66,7 @@
               <li>Mentor od NTI</li>
               <li>Ad hoc výberové konanie</li>
             </ul>
-            <RouterLink to="/program-b" class="btn-outline">Viac o Programme B →</RouterLink>
+            <RouterLink to="/prax" class="btn-outline">Viac o Programme B →</RouterLink>
           </div>
         </div>
       </div>

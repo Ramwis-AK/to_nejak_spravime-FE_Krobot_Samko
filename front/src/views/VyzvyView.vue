@@ -35,7 +35,7 @@ import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
 import FilterBar from '../components/FilterBar.vue'
 export default {
-  name: 'VyzyvyView',
+  name: 'VyzvyView',
   components: { AppFooter, FilterBar },
   setup() {
     const store = useNtiStore()

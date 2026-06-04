@@ -104,24 +104,15 @@ export default {
 <style scoped>
 .kontakt-page { max-width: 1100px; margin: 0 auto; padding: 4rem 2rem; min-height: calc(100vh - var(--navbar-h) - 200px); }
 .kontakt-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 5rem; align-items: start; }
-
 .kontakt-info h1 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; color: var(--navy); margin-bottom: 0.75rem; }
 .kontakt-sub { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 2.5rem; }
-
 .kontakt-detail-list { display: flex; flex-direction: column; gap: 1.25rem; }
 .kdl-item { display: flex; gap: 1rem; align-items: flex-start; }
 .kdl-icon { color: var(--accent); font-size: 1rem; min-width: 20px; margin-top: 2px; }
 .kdl-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.2rem; }
 .kdl-item a, .kdl-item span { font-size: 0.9rem; color: var(--navy); text-decoration: none; }
 .kdl-item a:hover { color: var(--accent); }
-
 .kontakt-form-box { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 2rem; }
 .kontakt-form-box h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--navy); font-weight: 400; margin-bottom: 1.5rem; }
-
-.form-success { background: var(--green-bg); color: var(--green-text); border: 1px solid #a7f3d0; border-radius: 4px; padding: 1.25rem; font-size: 0.9rem; }
-
-@media (max-width: 768px) {
-  .kontakt-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-  .kontakt-page { padding: 2.5rem 1.25rem; }
-}
+@media (max-width: 768px) { .kontakt-grid { grid-template-columns: 1fr; gap: 2.5rem; } .kontakt-page { padding: 2.5rem 1.25rem; } }
 </style>

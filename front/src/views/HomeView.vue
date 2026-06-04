@@ -13,13 +13,13 @@
         </div>
       </div>
       <div class="home-hero-cards">
-        <RouterLink to="/program-a" class="hero-card">
+        <RouterLink to="/startup" class="hero-card">
           <span class="hero-card-tag">Program A</span>
           <h3>Grantový inkubačný program</h3>
           <p>Vlastný nápad → startup alebo produkt. Financovanie + mentoring.</p>
           <span class="hero-card-arrow">→</span>
         </RouterLink>
-        <RouterLink to="/program-b" class="hero-card">
+        <RouterLink to="/prax" class="hero-card">
           <span class="hero-card-tag">Program B</span>
           <h3>Program živej praxe</h3>
           <p>Reálne zadania od firiem. Odmena, skúsenosť, Product Owner.</p>

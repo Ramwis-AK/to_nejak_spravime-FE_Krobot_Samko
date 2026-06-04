@@ -9,7 +9,6 @@
         ✓ Registrácia bola odoslaná. Skontrolujte váš e-mail pre potvrdenie.
       </div>
       <template v-else>
-        <!-- Spoločné polia -->
         <p class="form-section-title">Základné údaje</p>
         <div class="form-row">
           <div class="form-group">
@@ -38,7 +37,6 @@
 
         <hr class="form-divider" />
 
-        <!-- Polia pre študenta / vedúceho -->
         <template v-if="role.key === 'student' || role.key === 'vedouci'">
           <p class="form-section-title">Študentské informácie</p>
           <div class="form-row">
@@ -70,7 +68,6 @@
           </div>
         </template>
 
-        <!-- Polia pre firmu -->
         <template v-if="role.key === 'firma'">
           <p class="form-section-title">Informácie o organizácii</p>
           <div class="form-group">
@@ -98,7 +95,6 @@
           </div>
         </template>
 
-        <!-- Polia pre mentora -->
         <template v-if="role.key === 'mentor'">
           <p class="form-section-title">Odborný profil</p>
           <div class="form-group">
@@ -177,8 +173,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.form-success { background: var(--green-bg); color: var(--green-text); border: 1px solid #a7f3d0; border-radius: 4px; padding: 1.25rem; font-size: 0.9rem; }
-.form-error { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; border-radius: 4px; padding: 0.9rem 1rem; font-size: 0.85rem; margin-bottom: 0.5rem; }
-</style>
