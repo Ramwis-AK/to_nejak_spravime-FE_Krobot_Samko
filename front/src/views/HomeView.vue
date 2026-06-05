@@ -8,7 +8,7 @@
         <h1 class="home-hero-title">Nečakaj.<br>Registruj sa <span class="gold">teraz.</span></h1>
         <p class="home-hero-sub">Vstúp do programu, ktorý mení nápady na startupy a študentov na profesionálov. Dva programy, jeden ekosystém.</p>
         <div class="home-hero-cta">
-          <RouterLink to="/registracia" class="btn-primary">Zaregistrovať sa →</RouterLink>
+          <RouterLink v-if="!userStore.isLoggedIn" to="/registracia" class="btn-primary">Zaregistrovať sa →</RouterLink>
           <RouterLink to="/o-nti" class="btn-secondary">Zistiť viac</RouterLink>
         </div>
       </div>
@@ -41,7 +41,7 @@
         <div class="home-about-text">
           <p class="section-label">Kto sme</p>
           <h2 class="section-title">Nitriansky technologický inkubátor</h2>
-          <p>NTI vznikol ako odpoveď na odliv technologických talentov z regiónu. Prepájame inovatívnych študentov s reálnymi firmami, mentormi a grantovými príležitosťami.</p>
+          <p>NTI vznikol ako odpoveď na odliv technologických talentov z regiónu. Prepájame inovatívnych študentov s reálnymi firmami, mentormi a grantovými príležititosťami.</p>
           <p>Naše dva programy pokrývajú celý životný cyklus — od nápadu až po produkt alebo pracovnú skúsenosť.</p>
           <RouterLink to="/o-nti" class="btn-outline" style="margin-top:1.5rem;display:inline-block;">Viac o NTI →</RouterLink>
         </div>
@@ -70,36 +70,44 @@
       </div>
     </section>
 
-    <CtaSection title="Pripravený začať?" sub="Zaregistruj sa a vstúp do ekosystému NTI ešte dnes.">
-      <RouterLink to="/registracia" class="btn-primary">Zaregistrovať sa</RouterLink>
-      <RouterLink to="/kontakt" class="btn-secondary">Kontaktovať NTI</RouterLink>
-    </CtaSection>
-
     <AppFooter />
   </div>
 </template>
 
 <script>
+// Import oboch storov z priečinka stores
+import { useUserStore } from '../stores/user.js'
 import { useNtiStore } from '../stores/nti.js'
+
+// Import komponentov
 import AppFooter from '../components/AppFooter.vue'
 import SectionHeader from '../components/SectionHeader.vue'
-import CtaSection from '../components/CtaSection.vue'
+
 export default {
   name: 'HomeView',
-  components: { AppFooter, SectionHeader, CtaSection },
+  components: { AppFooter, SectionHeader },
   setup() {
+    // Inicializácia storov
     const store = useNtiStore()
+    const userStore = useUserStore()
+
+    // Statické dáta pre piliere
     const piliere = [
       { id: 1, nazov: 'Inkubácia', popis: 'Vznik a akcelerácia projektov s mentorskou podporou.' },
       { id: 2, nazov: 'Partnerstvá', popis: 'Prepojenie s regionálnymi a medzinárodnými firmami.' },
       { id: 3, nazov: 'Mentoring', popis: 'Sprevádzanie tímov od nápadu po výsledok.' },
       { id: 4, nazov: 'Retencia', popis: 'Budovanie komunity a dlhodobej väzby na región.' },
     ]
-    return { store, piliere }
+
+    // Odovzdanie všetkého do šablóny
+    return { 
+      store, 
+      piliere, 
+      userStore 
+    }
   }
 }
 </script>
-
 <style scoped>
 .gold { color: var(--accent); }
 .home-hero { background: var(--navy); min-height: 80vh; display: flex; flex-direction: column; justify-content: center; padding: 5rem 2.5rem 4rem; position: relative; overflow: hidden; }

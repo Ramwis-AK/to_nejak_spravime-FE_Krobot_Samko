@@ -17,6 +17,7 @@ const router = createRouter({
     { path: '/kontakt', name: 'kontakt', component: () => import('../views/KontaktView.vue') },
     { path: '/registracia', name: 'registracia', component: () => import('../views/RegistraciaView.vue') },
     { path: '/registracia/:role', name: 'reg-form', component: () => import('../views/RegistraciaformView.vue') },
+    { path: '/dashboard', name: 'Dashboard', component: () => import('../views/DashboardView.vue') },
   ],
 })
 

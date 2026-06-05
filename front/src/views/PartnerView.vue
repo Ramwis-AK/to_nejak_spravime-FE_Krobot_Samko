@@ -45,10 +45,9 @@ import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
 import PageHero from '../components/PageHero.vue'
 import SectionHeader from '../components/SectionHeader.vue'
-import CtaSection from '../components/CtaSection.vue'
 export default {
   name: 'PartneriView',
-  components: { AppFooter, PageHero, SectionHeader, CtaSection },
+  components: { AppFooter, PageHero, SectionHeader},
   setup() { return { store: useNtiStore() } }
 }
 </script>

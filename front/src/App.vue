@@ -10,7 +10,17 @@
         <RouterLink to="/partneri" @click="menuOpen = false">Partneri</RouterLink>
         <RouterLink to="/novinky" @click="menuOpen = false">Novinky</RouterLink>
         <RouterLink to="/kontakt" @click="menuOpen = false">Kontakt</RouterLink>
-        <RouterLink to="/registracia" class="nav-cta" @click="menuOpen = false">Registrácia/Prihlásenie</RouterLink>
+
+        <!-- Neprihlásený -->
+        <template v-if="!userStore.role">
+          <RouterLink to="/registracia" class="nav-cta" @click="menuOpen = false">Registrácia/Prihlásenie</RouterLink>
+        </template>
+
+        <!-- Prihlásený -->
+        <template v-else>
+          <RouterLink to="/dashboard" class="nav-cta" @click="menuOpen = false">Profil</RouterLink>
+          <button class="nav-logout" @click="logout">Odhlásiť</button>
+        </template>
       </div>
       <button class="nav-mobile-toggle" @click="menuOpen = !menuOpen" aria-label="Menu">
         <svg width="22" height="22" fill="none" stroke="#c8d0e0" stroke-width="2">
@@ -28,10 +38,41 @@
 
 <script>
 import { ref } from 'vue'
+import { useUserStore } from './stores/user.js'
+import { useRouter } from 'vue-router'
+
 export default {
   name: 'App',
   setup() {
-    return { menuOpen: ref(false) }
+    const menuOpen = ref(false)
+    const userStore = useUserStore()
+    const router = useRouter()
+
+    function logout() {
+      userStore.logout()
+      menuOpen.value = false
+      router.push('/registracia')
+    }
+
+    return { menuOpen, userStore, logout }
   }
 }
 </script>
+
+<style scoped>
+.nav-logout {
+  background: none;
+  border: 1px solid rgba(200, 151, 42, 0.5);
+  color: #c8972a;
+  font-size: 0.9rem;
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-family: inherit;
+}
+.nav-logout:hover {
+  background: #c8972a;
+  color: #fff;
+}
+</style>
