@@ -9,7 +9,6 @@
         <h4>Programy</h4>
         <RouterLink to="/startup">Program A — Startup</RouterLink>
         <RouterLink to="/prax">Program B — Prax</RouterLink>
-        <RouterLink to="/vyzvy">Výzvy a termíny</RouterLink>
       </div>
       <div class="footer-col">
         <h4>Komunita</h4>

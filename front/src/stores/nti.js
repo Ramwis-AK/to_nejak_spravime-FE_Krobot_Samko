@@ -24,10 +24,7 @@ export const useNtiStore = defineStore('nti', {
       { key: 'vedouci', name: 'Vedúci tímu', desc: 'Jednotlivec s právom správy tímu alebo zakladajúci StartUp' },
       { key: 'firma', name: 'Firma / partner', desc: 'Organizácia zadávajúca výzvu pre prax alebo zakladajúca StartUp' },
       { key: 'mentor', name: 'Mentor', desc: 'Osoba sprevádzajúca projekt alebo tím' },
-      { key: 'komisia', name: 'Komisia / evaluator', desc: 'Hodnotiteľ prihlášok' },
-      { key: 'editor', name: 'Editor obsahu', desc: 'Správca verejného obsahu' },
-      { key: 'nti-admin', name: 'NTI administrátor', desc: 'Prevádzkový správca programu' },
-      { key: 'super-admin', name: 'Super administrátor', desc: 'Technicko-prevádzková rola' },
+      { key: 'komisia', name: 'Komisia / evaluator', desc: 'Hodnotiteľ prihlášok' }
     ],
     partneri: [
       { id: 1, nazov: 'UKF Nitra', typ: 'Akademický', popis: 'Univerzita Konštantína Filozofa v Nitre — zakladajúci akademický partner programu.' },
@@ -43,13 +40,6 @@ export const useNtiStore = defineStore('nti', {
       { id: 3, meno: 'Martin Blaho', oblast: 'Biznis & Financie', skusenosti: 'Investor, 3 exits' },
       { id: 4, meno: 'Peter Šimko', oblast: 'AI & Dáta', skusenosti: 'PhD, ML engineer' },
     ],
-    vyzvy: [
-      { id: 1, nazov: 'Program A — Jarné kolo 2025', typ: 'Program A', stav: 'Uzavreté', deadline: '2025-03-31', popis: 'Grantový inkubačný program — jarná vlna prihlášok.' },
-      { id: 2, nazov: 'Program B — Výzva Q2 2025', typ: 'Program B', stav: 'Uzavreté', deadline: '2025-04-15', popis: 'Živá prax — firemné zadania na Q2.' },
-      { id: 3, nazov: 'Program A — Jesenné kolo 2025', typ: 'Program A', stav: 'Aktívne', deadline: '2025-10-15', popis: 'Grantový inkubačný program — jesenná vlna. Tímy min. 3 členov.' },
-      { id: 4, nazov: 'Program B — Výzva Q4 2025', typ: 'Program B', stav: 'Aktívne', deadline: '2025-11-01', popis: 'Živá prax — nové firemné zadania na Q4.' },
-      { id: 5, nazov: 'Program A — Jarné kolo 2026', typ: 'Program A', stav: 'Pripravované', deadline: '2026-03-31', popis: 'Nadchádzajúce jarné kolo — detaily budú zverejnené.' },
-    ],
     novinky: [
       { id: 1, titul: 'NTI otvára jesenné kolo Programu A', datum: '2025-09-01', perex: 'Registrácia pre tímy s vlastným inovatívnym nápadom je otvorená do 15. októbra 2025.', kategoria: 'Oznámenie' },
       { id: 2, titul: 'EcoFlow získal €200k ARR — úspešný exit z inkubátora', datum: '2025-08-15', perex: 'Startup EcoFlow, ktorý prešiel Programom A, oznámil prvý veľký míľnik v oblasti udržateľnej energie.', kategoria: 'Úspešný príbeh' },
@@ -61,8 +51,6 @@ export const useNtiStore = defineStore('nti', {
     getStartupById: (state) => (id) => state.startups.find(s => s.id === Number(id)),
     getPraxById: (state) => (id) => state.praxe.find(p => p.id === Number(id)),
     getRoleByKey: (state) => (key) => state.roles.find(r => r.key === key),
-    getVyzvaById: (state) => (id) => state.vyzvy.find(v => v.id === Number(id)),
     getNovinkaById: (state) => (id) => state.novinky.find(n => n.id === Number(id)),
-    activeVyzvy: (state) => state.vyzvy.filter(v => v.stav === 'Aktívne'),
   },
 })

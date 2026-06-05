@@ -8,10 +8,9 @@
         <RouterLink to="/startup" @click="menuOpen = false">Program A</RouterLink>
         <RouterLink to="/prax" @click="menuOpen = false">Program B</RouterLink>
         <RouterLink to="/partneri" @click="menuOpen = false">Partneri</RouterLink>
-        <RouterLink to="/vyzvy" @click="menuOpen = false">Výzvy</RouterLink>
         <RouterLink to="/novinky" @click="menuOpen = false">Novinky</RouterLink>
         <RouterLink to="/kontakt" @click="menuOpen = false">Kontakt</RouterLink>
-        <RouterLink to="/registracia" class="nav-cta" @click="menuOpen = false">Registrácia</RouterLink>
+        <RouterLink to="/registracia" class="nav-cta" @click="menuOpen = false">Registrácia/Prihlásenie</RouterLink>
       </div>
       <button class="nav-mobile-toggle" @click="menuOpen = !menuOpen" aria-label="Menu">
         <svg width="22" height="22" fill="none" stroke="#c8d0e0" stroke-width="2">

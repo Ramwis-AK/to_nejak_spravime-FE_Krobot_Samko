@@ -36,22 +36,6 @@
       <div class="stat"><span class="stat-num">{{ store.stats.projects }}</span><span class="stat-label">Projektov</span></div>
     </section>
 
-    <section class="home-section" v-if="store.activeVyzvy.length">
-      <div class="home-section-inner">
-        <SectionHeader label="Otvorené prihlášky" title="Aktívne výzvy">
-          <template #action><RouterLink to="/vyzvy" class="btn-outline">Všetky výzvy →</RouterLink></template>
-        </SectionHeader>
-        <div class="vyzvy-grid">
-          <RouterLink v-for="v in store.activeVyzvy" :key="v.id" to="/vyzvy" class="vyzva-card">
-            <span :class="['tag', v.typ === 'Program A' ? 'tag-area' : 'tag-faza seed']">{{ v.typ }}</span>
-            <h3>{{ v.nazov }}</h3>
-            <p>{{ v.popis }}</p>
-            <div class="vyzva-deadline">Deadline: {{ v.deadline }}</div>
-          </RouterLink>
-        </div>
-      </div>
-    </section>
-
     <section class="home-about">
       <div class="home-about-inner">
         <div class="home-about-text">
