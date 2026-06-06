@@ -8,8 +8,22 @@
         <span :class="['tag','tag-faza', startup.faza.replace(' ','-').toLowerCase()]">{{ startup.faza }}</span>
         <span class="tag">{{ startup.lokalita }}</span>
       </div>
+
       <DetailCard :rows="rows" />
-      <p class="placeholder-note">Ďalší obsah bude doplnený po napojení na backend.</p>
+
+      <div class="detail-section">
+        <h2>O projekte</h2>
+        <p>{{ startup.vp }}</p>
+      </div>
+
+      <div class="detail-section">
+        <h2>Kontakt na zakladateľa</h2>
+        <div class="kontakt-box">
+          <p><strong>Meno:</strong> {{ startup.zakladatel ?? '—' }}</p>
+          <p><strong>E-mail:</strong> {{ startup.kontaktEmail ?? '—' }}</p>
+          <p><strong>Telefón:</strong> {{ startup.kontaktTel ?? '—' }}</p>
+        </div>
+      </div>
     </div>
     <div v-else class="detail-page">
       <RouterLink to="/startup" class="back-btn">← Späť</RouterLink>
@@ -33,12 +47,41 @@ export default {
     const route = useRoute()
     const startup = computed(() => store.getStartupById(route.params.id))
     const rows = computed(() => startup.value ? [
-      { label: 'Value proposition', key: 'vp', value: startup.value.vp },
-      { label: 'Investícia', key: 'investicia', value: startup.value.investicia },
-      { label: 'Fáza', key: 'faza', value: startup.value.faza },
-      { label: 'Lokalita', key: 'lokalita', value: startup.value.lokalita },
+      { label: 'Oblasť', value: startup.value.oblast },
+      { label: 'Fáza', value: startup.value.faza },
+      { label: 'Lokalita', value: startup.value.lokalita },
+      { label: 'Investícia', value: startup.value.investicia },
     ] : [])
     return { startup, rows }
   }
 }
 </script>
+
+<style scoped>
+.detail-section {
+  margin-top: 2rem;
+}
+.detail-section h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.detail-section p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.kontakt-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.kontakt-box p {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0;
+}
+</style>
