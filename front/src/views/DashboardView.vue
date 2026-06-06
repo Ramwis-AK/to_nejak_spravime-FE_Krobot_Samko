@@ -37,81 +37,57 @@
         <!-- ===== ŠTUDENT ===== -->
         <template v-if="role === 'student'">
 
-          <!-- PROFIL -->
-          <div v-if="activeSection === 'profil'">
-            <div class="db-panel">
-              <h3>Môj profil</h3>
-              <div class="db-form-group">
-                <label>Meno a priezvisko</label>
-                <input class="db-input" v-model="profil.meno" type="text" />
+          <div v-if="activeSection === 'profil'" class="db-panel">
+            <h3>Môj profil</h3>
+            <div class="db-form-group"><label>Meno a priezvisko</label><input class="db-input" v-model="profil.meno" type="text" /></div>
+            <div class="db-form-group"><label>E-mail</label><input class="db-input" v-model="profil.email" type="email" /></div>
+            <div class="db-form-group"><label>Heslo</label><input class="db-input" v-model="profil.heslo" type="password" placeholder="••••••••" /></div>
+            <div class="db-form-group"><label>Adresa</label><input class="db-input" v-model="profil.adresa" type="text" placeholder="Ulica, Mesto, PSČ" /></div>
+            <div class="db-form-group"><label>Telefón</label><input class="db-input" v-model="profil.telefon" type="tel" placeholder="+421 9xx xxx xxx" /></div>
+            <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
+            <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
+          </div>
+
+          <div v-else-if="activeSection === 'prihlaška'" class="db-panel">
+            <h3>Moja prihláška</h3>
+            <div v-if="!prihlaška.podana">
+              <p class="db-muted" style="margin-bottom:1rem;">Prihlás sa do existujúceho projektu:</p>
+              <div class="db-prog-cards">
+                <div class="db-prog-card" @click="zacatPrihlaskaProgram('A')">
+                  <span class="db-prog-tag">Program A</span>
+                  <strong>Startup / Inkubácia</strong>
+                  <p>Pripojiť sa k existujúcemu startupu v seed fáze</p>
+                  <span class="db-btn-sm">Vybrať projekt →</span>
+                </div>
+                <div class="db-prog-card" @click="zacatPrihlaskaProgram('B')">
+                  <span class="db-prog-tag">Program B</span>
+                  <strong>Živá prax</strong>
+                  <p>Prihlás sa na otvorené zadanie od firmy</p>
+                  <span class="db-btn-sm">Vybrať zadanie →</span>
+                </div>
               </div>
-              <div class="db-form-group">
-                <label>E-mail</label>
-                <input class="db-input" v-model="profil.email" type="email" />
-              </div>
-              <div class="db-form-group">
-                <label>Heslo</label>
-                <input class="db-input" v-model="profil.heslo" type="password" placeholder="••••••••" />
-              </div>
-              <div class="db-form-group">
-                <label>Adresa</label>
-                <input class="db-input" v-model="profil.adresa" type="text" placeholder="Ulica, Mesto, PSČ" />
-              </div>
-              <div class="db-form-group">
-                <label>Telefón</label>
-                <input class="db-input" v-model="profil.telefon" type="tel" placeholder="+421 9xx xxx xxx" />
-              </div>
-              <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
-              <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
+            </div>
+            <div v-else class="db-info-grid">
+              <span class="db-info-label">Program</span><span>{{ prihlaška.program }}</span>
+              <span class="db-info-label">Projekt</span><span>{{ prihlaška.nazov || '—' }}</span>
+              <span class="db-info-label">Stav</span><span :class="['db-badge', stavBadgeClass(prihlaška.stav)]">{{ prihlaška.stav }}</span>
+              <span class="db-info-label">Podaná</span><span>{{ prihlaška.datum || '—' }}</span>
             </div>
           </div>
 
-          <!-- PRIHLÁŠKA -->
-          <div v-else-if="activeSection === 'prihlaška'">
-            <div class="db-panel">
-              <h3>Moja prihláška</h3>
-              <div v-if="!prihlaška.podana">
-                <p class="db-muted">Zatiaľ si nepodal prihlášku. Vyber program:</p>
-                <div class="db-prog-cards">
-                  <div class="db-prog-card" @click="zacatPrihlaskaProgram('A')">
-                    <span class="db-prog-tag">Program A</span>
-                    <strong>Startup / Inkubácia</strong>
-                    <p>Vlastný nápad — seed fáza</p>
-                    <span class="db-btn-sm">Začať prihlášku →</span>
-                  </div>
-                  <div class="db-prog-card" @click="zacatPrihlaskaProgram('B')">
-                    <span class="db-prog-tag">Program B</span>
-                    <strong>Živá prax</strong>
-                    <p>Zadanie od firmy — otvorené výzvy</p>
-                    <span class="db-btn-sm">Začať prihlášku →</span>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="db-info-grid">
-                <span class="db-info-label">Program</span><span>{{ prihlaška.program }}</span>
-                <span class="db-info-label">Projekt</span><span>{{ prihlaška.nazov || '—' }}</span>
-                <span class="db-info-label">Stav</span><span :class="['db-badge', stavBadgeClass(prihlaška.stav)]">{{ prihlaška.stav }}</span>
-                <span class="db-info-label">Podaná</span><span>{{ prihlaška.datum || '—' }}</span>
+          <div v-else-if="activeSection === 'dokumenty'" class="db-panel">
+            <h3>Moje dokumenty</h3>
+            <div class="db-form-group">
+              <label>Nahrať CV (PDF)</label>
+              <input type="file" accept=".pdf,.doc,.docx" @change="nahratDokument" class="db-file-input" />
+            </div>
+            <div v-if="dokumenty.length" class="db-doc-list">
+              <div v-for="(doc, i) in dokumenty" :key="i" class="db-doc-item">
+                <span>📄 {{ doc.name }}</span>
+                <button class="db-btn-danger" @click="dokumenty.splice(i,1)">Odstrániť</button>
               </div>
             </div>
-          </div>
-
-          <!-- DOKUMENTY -->
-          <div v-else-if="activeSection === 'dokumenty'">
-            <div class="db-panel">
-              <h3>Moje dokumenty</h3>
-              <div class="db-form-group">
-                <label>Nahrať CV (PDF)</label>
-                <input type="file" accept=".pdf,.doc,.docx" @change="nahratDokument" class="db-file-input" />
-              </div>
-              <div v-if="dokumenty.length" class="db-doc-list">
-                <div v-for="(doc, i) in dokumenty" :key="i" class="db-doc-item">
-                  <span>📄 {{ doc.name }}</span>
-                  <button class="db-btn-danger" @click="dokumenty.splice(i,1)">Odstrániť</button>
-                </div>
-              </div>
-              <div v-else class="db-empty">Žiadne nahrané dokumenty.</div>
-            </div>
+            <div v-else class="db-empty">Žiadne nahrané dokumenty.</div>
           </div>
 
         </template>
@@ -119,110 +95,81 @@
         <!-- ===== VEDÚCI TÍMU ===== -->
         <template v-else-if="role === 'vedouci'">
 
-          <!-- PROFIL -->
-          <div v-if="activeSection === 'profil'">
-            <div class="db-panel">
-              <h3>Môj profil</h3>
-              <div class="db-form-group">
-                <label>Meno a priezvisko</label>
-                <input class="db-input" v-model="profil.meno" type="text" />
+          <div v-if="activeSection === 'profil'" class="db-panel">
+            <h3>Môj profil</h3>
+            <div class="db-form-group"><label>Meno a priezvisko</label><input class="db-input" v-model="profil.meno" type="text" /></div>
+            <div class="db-form-group"><label>E-mail</label><input class="db-input" v-model="profil.email" type="email" /></div>
+            <div class="db-form-group"><label>Heslo</label><input class="db-input" v-model="profil.heslo" type="password" placeholder="••••••••" /></div>
+            <div class="db-form-group"><label>Adresa</label><input class="db-input" v-model="profil.adresa" type="text" placeholder="Ulica, Mesto, PSČ" /></div>
+            <div class="db-form-group"><label>Telefón</label><input class="db-input" v-model="profil.telefon" type="tel" placeholder="+421 9xx xxx xxx" /></div>
+            <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
+            <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
+          </div>
+
+          <div v-else-if="activeSection === 'prihlaška'" class="db-panel">
+            <h3>Prihláška tímu</h3>
+            <div v-if="!prihlaška.podana">
+              <p class="db-muted" style="margin-bottom:1rem;">Vyber program pre tím:</p>
+              <div class="db-prog-cards">
+                <div class="db-prog-card" @click="zacatPrihlaskaProgram('A')">
+                  <span class="db-prog-tag">Program A</span>
+                  <strong>Startup / Inkubácia</strong>
+                  <p>Vytvor nový startup v seed fáze</p>
+                  <span class="db-btn-sm">Vytvoriť startup →</span>
+                </div>
+                <div class="db-prog-card" @click="zacatPrihlaskaProgram('B')">
+                  <span class="db-prog-tag">Program B</span>
+                  <strong>Živá prax</strong>
+                  <p>Prihláste tím na otvorené zadanie firmy</p>
+                  <span class="db-btn-sm">Prihlásiť tím →</span>
+                </div>
               </div>
-              <div class="db-form-group">
-                <label>E-mail</label>
-                <input class="db-input" v-model="profil.email" type="email" />
-              </div>
-              <div class="db-form-group">
-                <label>Heslo</label>
-                <input class="db-input" v-model="profil.heslo" type="password" placeholder="••••••••" />
-              </div>
-              <div class="db-form-group">
-                <label>Adresa</label>
-                <input class="db-input" v-model="profil.adresa" type="text" placeholder="Ulica, Mesto, PSČ" />
-              </div>
-              <div class="db-form-group">
-                <label>Telefón</label>
-                <input class="db-input" v-model="profil.telefon" type="tel" placeholder="+421 9xx xxx xxx" />
-              </div>
-              <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
-              <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
+            </div>
+            <div v-else class="db-info-grid">
+              <span class="db-info-label">Program</span><span>{{ prihlaška.program }}</span>
+              <span class="db-info-label">Projekt</span><span>{{ prihlaška.nazov || '—' }}</span>
+              <span class="db-info-label">Stav</span><span :class="['db-badge', stavBadgeClass(prihlaška.stav)]">{{ prihlaška.stav }}</span>
+              <span class="db-info-label">Podaná</span><span>{{ prihlaška.datum || '—' }}</span>
             </div>
           </div>
 
-          <!-- PRIHLÁŠKA -->
-          <div v-else-if="activeSection === 'prihlaška'">
-            <div class="db-panel">
-              <h3>Prihláška tímu</h3>
-              <div v-if="!prihlaška.podana">
-                <p class="db-muted">Tím ešte nepodal prihlášku. Vyber program:</p>
-                <div class="db-prog-cards">
-                  <div class="db-prog-card" @click="zacatPrihlaskaProgram('A')">
-                    <span class="db-prog-tag">Program A</span>
-                    <strong>Startup / Inkubácia</strong>
-                    <p>Vlastný nápad — seed fáza</p>
-                    <span class="db-btn-sm">Začať prihlášku →</span>
-                  </div>
-                  <div class="db-prog-card" @click="zacatPrihlaskaProgram('B')">
-                    <span class="db-prog-tag">Program B</span>
-                    <strong>Živá prax</strong>
-                    <p>Zadanie od firmy — otvorené výzvy</p>
-                    <span class="db-btn-sm">Začať prihlášku →</span>
-                  </div>
-                </div>
+          <div v-else-if="activeSection === 'tim'" class="db-panel">
+            <h3>Môj tím</h3>
+            <div class="db-info-grid">
+              <span class="db-info-label">Názov tímu</span><span>{{ tim.nazov }}</span>
+              <span class="db-info-label">Program</span><span>{{ tim.program || '—' }}</span>
+              <span class="db-info-label">Počet členov</span><span>{{ tim.clenovia.length }}</span>
+            </div>
+            <div class="db-section-divider">Členovia tímu</div>
+            <div v-if="tim.clenovia.length" class="db-clenovia-list">
+              <div v-for="(clen, i) in tim.clenovia" :key="i" class="db-clen-item">
+                <span>{{ clen.meno }}</span>
+                <span class="db-muted">{{ clen.telefon }}</span>
+                <button class="db-btn-danger-sm" @click="tim.clenovia.splice(i,1)">✕</button>
               </div>
-              <div v-else class="db-info-grid">
-                <span class="db-info-label">Program</span><span>{{ prihlaška.program }}</span>
-                <span class="db-info-label">Projekt</span><span>{{ prihlaška.nazov || '—' }}</span>
-                <span class="db-info-label">Stav</span><span :class="['db-badge', stavBadgeClass(prihlaška.stav)]">{{ prihlaška.stav }}</span>
-                <span class="db-info-label">Podaná</span><span>{{ prihlaška.datum || '—' }}</span>
-              </div>
+            </div>
+            <div v-else class="db-empty">Zatiaľ žiadni ďalší členovia.</div>
+            <div class="db-section-divider">Pozvať člena</div>
+            <div class="db-invite-row">
+              <input class="db-input" v-model="novyClen.meno" placeholder="Meno a priezvisko" />
+              <input class="db-input" v-model="novyClen.telefon" placeholder="+421 9xx xxx xxx" />
+              <button class="db-btn" @click="pozvatClena">Pridať</button>
             </div>
           </div>
 
-          <!-- MÔJ TÍM -->
-          <div v-else-if="activeSection === 'tim'">
-            <div class="db-panel">
-              <h3>Môj tím</h3>
-              <div class="db-info-grid">
-                <span class="db-info-label">Názov tímu</span><span>{{ tim.nazov || '—' }}</span>
-                <span class="db-info-label">Program</span><span>{{ tim.program || '—' }}</span>
-                <span class="db-info-label">Počet členov</span><span>{{ tim.clenovia.length }}</span>
+          <div v-else-if="activeSection === 'komunikacia'" class="db-panel db-chat-panel">
+            <h3>Komunikácia s NTI</h3>
+            <div class="db-chat-messages" ref="chatEl">
+              <div v-for="(msg, i) in chatSpravy" :key="i" :class="['db-chat-msg', msg.od === 'ja' ? 'moje' : 'nti']">
+                <span class="db-chat-sender">{{ msg.od === 'ja' ? userStore.meno : 'NTI Podpora' }}</span>
+                <p>{{ msg.text }}</p>
+                <span class="db-chat-time">{{ msg.cas }}</span>
               </div>
-
-              <div class="db-section-divider">Členovia tímu</div>
-              <div v-if="tim.clenovia.length" class="db-clenovia-list">
-                <div v-for="(clen, i) in tim.clenovia" :key="i" class="db-clen-item">
-                  <span>{{ clen.meno }}</span>
-                  <span class="db-muted">{{ clen.telefon }}</span>
-                  <button class="db-btn-danger-sm" @click="tim.clenovia.splice(i,1)">✕</button>
-                </div>
-              </div>
-              <div v-else class="db-empty">Zatiaľ žiadni ďalší členovia.</div>
-
-              <div class="db-section-divider">Pozvať člena</div>
-              <div class="db-invite-row">
-                <input class="db-input" v-model="novyClen.meno" placeholder="Meno a priezvisko" />
-                <input class="db-input" v-model="novyClen.telefon" placeholder="+421 9xx xxx xxx" />
-                <button class="db-btn" @click="pozvatClena">Pridať</button>
-              </div>
+              <div v-if="!chatSpravy.length" class="db-empty">Žiadne správy.</div>
             </div>
-          </div>
-
-          <!-- KOMUNIKÁCIA -->
-          <div v-else-if="activeSection === 'komunikacia'">
-            <div class="db-panel db-chat-panel">
-              <h3>Komunikácia s NTI</h3>
-              <div class="db-chat-messages" ref="chatEl">
-                <div v-for="(msg, i) in chatSpravy" :key="i" :class="['db-chat-msg', msg.od === 'ja' ? 'moje' : 'nti']">
-                  <span class="db-chat-sender">{{ msg.od === 'ja' ? userStore.meno : 'NTI Podpora' }}</span>
-                  <p>{{ msg.text }}</p>
-                  <span class="db-chat-time">{{ msg.cas }}</span>
-                </div>
-                <div v-if="!chatSpravy.length" class="db-empty">Žiadne správy.</div>
-              </div>
-              <div class="db-chat-input-row">
-                <input class="db-input" v-model="novaSpravaText" placeholder="Napíš správu..." @keyup.enter="odoslatSpravu" />
-                <button class="db-btn" @click="odoslatSpravu">Odoslať</button>
-              </div>
+            <div class="db-chat-input-row">
+              <input class="db-input" v-model="novaSpravaText" placeholder="Napíš správu..." @keyup.enter="odoslatSpravu" />
+              <button class="db-btn" @click="odoslatSpravu">Odoslať</button>
             </div>
           </div>
 
@@ -231,81 +178,89 @@
         <!-- ===== FIRMA ===== -->
         <template v-else-if="role === 'firma'">
 
-          <!-- PROFIL -->
-          <div v-if="activeSection === 'profil'">
-            <div class="db-panel">
-              <h3>Firemný profil</h3>
-              <div class="db-form-group">
-                <label>Názov firmy</label>
-                <input class="db-input" v-model="profil.meno" type="text" />
-              </div>
-              <div class="db-form-group">
-                <label>E-mail</label>
-                <input class="db-input" v-model="profil.email" type="email" />
-              </div>
-              <div class="db-form-group">
-                <label>Heslo</label>
-                <input class="db-input" v-model="profil.heslo" type="password" placeholder="••••••••" />
-              </div>
-              <div class="db-form-group">
-                <label>Adresa sídla</label>
-                <input class="db-input" v-model="profil.adresa" type="text" placeholder="Ulica, Mesto, PSČ" />
-              </div>
-              <div class="db-form-group">
-                <label>Kontaktný telefón</label>
-                <input class="db-input" v-model="profil.telefon" type="tel" placeholder="+421 9xx xxx xxx" />
-              </div>
-              <div class="db-form-group">
-                <label>IČO</label>
-                <input class="db-input" v-model="profil.ico" type="text" placeholder="12345678" />
-              </div>
-              <div class="db-form-group">
-                <label>Sektor</label>
-                <input class="db-input" v-model="profil.sektor" type="text" placeholder="IT / FinTech / HealthTech..." />
-              </div>
-              <div class="db-form-group">
-                <label>Web</label>
-                <input class="db-input" v-model="profil.web" type="url" placeholder="https://firma.sk" />
-              </div>
-              <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
-              <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
-            </div>
+          <div v-if="activeSection === 'profil'" class="db-panel">
+            <h3>Firemný profil</h3>
+            <div class="db-form-group"><label>Názov firmy</label><input class="db-input" v-model="profil.meno" type="text" /></div>
+            <div class="db-form-group"><label>E-mail</label><input class="db-input" v-model="profil.email" type="email" /></div>
+            <div class="db-form-group"><label>Heslo</label><input class="db-input" v-model="profil.heslo" type="password" placeholder="••••••••" /></div>
+            <div class="db-form-group"><label>Adresa sídla</label><input class="db-input" v-model="profil.adresa" type="text" placeholder="Ulica, Mesto, PSČ" /></div>
+            <div class="db-form-group"><label>Telefón</label><input class="db-input" v-model="profil.telefon" type="tel" placeholder="+421 9xx xxx xxx" /></div>
+            <div class="db-form-group"><label>IČO</label><input class="db-input" v-model="profil.ico" type="text" placeholder="12345678" /></div>
+            <div class="db-form-group"><label>Sektor</label><input class="db-input" v-model="profil.sektor" type="text" placeholder="IT, AgriTech, HealthTech..." /></div>
+            <div class="db-form-group"><label>Web</label><input class="db-input" v-model="profil.web" type="url" placeholder="https://firma.sk" /></div>
+            <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
+            <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
           </div>
 
           <div v-else-if="activeSection === 'zadania'">
-            <div class="db-panel">
-              <h3>Zadania pre tímy</h3>
-              <div class="db-empty">Žiadne zadania. Zadania sa načítajú z backendu.</div>
-              <button class="db-btn">Pridať zadanie</button>
-            </div>
-          </div>
-
-          <div v-else-if="activeSection === 'spec'">
-            <div class="db-panel">
-              <h3>Technická špecifikácia</h3>
+            <!-- Formulár na pridanie / úpravu zadania -->
+            <div class="db-panel" style="margin-bottom:1rem;">
+              <h3>{{ editZadanie ? 'Upraviť zadanie' : 'Pridať zadanie' }}</h3>
+              <div class="db-form-group"><label>Názov zadania</label><input class="db-input" v-model="zadanieForm.nazov" type="text" placeholder="Napr. Webová aplikácia pre správu skladu" /></div>
+              <div class="db-form-group"><label>Sektor</label><input class="db-input" v-model="zadanieForm.sektor" type="text" placeholder="IT / SaaS, FinTech..." /></div>
+              <div class="db-form-group"><label>Lokalita</label><input class="db-input" v-model="zadanieForm.lokalita" type="text" placeholder="Nitra, Bratislava..." /></div>
+              <div class="db-form-group"><label>Odmena tímu</label><input class="db-input" v-model="zadanieForm.odmena" type="text" placeholder="€2 400 / tím" /></div>
+              <div class="db-form-group"><label>Popis</label><textarea class="db-input" v-model="zadanieForm.popis" rows="3" placeholder="Popis zadania..." /></div>
               <div class="db-form-group">
-                <label>Nahrať dokument (PDF)</label>
-                <input type="file" accept=".pdf,.doc,.docx" @change="nahratDokument" class="db-file-input" />
+                <label>Stav</label>
+                <select class="db-input" v-model="zadanieForm.stav">
+                  <option value="Otvorené">Otvorené</option>
+                  <option value="Párovanie">Párovanie</option>
+                  <option value="V realizácii">V realizácii</option>
+                  <option value="Uzavreté">Uzavreté</option>
+                </select>
               </div>
-              <div v-if="dokumenty.length" class="db-doc-list">
-                <div v-for="(doc, i) in dokumenty" :key="i" class="db-doc-item">
-                  <span>📄 {{ doc.name }}</span>
-                  <button class="db-btn-danger" @click="dokumenty.splice(i,1)">Odstrániť</button>
-                </div>
+              <div style="display:flex;gap:0.5rem;">
+                <button class="db-btn" @click="ulozZadanie">{{ editZadanie ? 'Uložiť zmeny' : 'Pridať zadanie' }}</button>
+                <button v-if="editZadanie" class="db-btn-outline" @click="zrusitEditZadanie">Zrušiť</button>
               </div>
-              <div v-else class="db-empty">Žiadne dokumenty.</div>
+              <p v-if="zadanieUlozene" class="db-success">Zadanie bolo uložené.</p>
             </div>
+
+            <!-- Zoznam existujúcich zadaní -->
+            <div v-if="firemneZadania.length">
+              <div v-for="(z, i) in firemneZadania" :key="i" class="db-zadanie-card">
+                <div class="db-zadanie-header">
+                  <strong>{{ z.nazov }}</strong>
+                  <span :class="['db-badge', z.stav === 'Otvorené' ? 'green' : 'grey']">{{ z.stav }}</span>
+                </div>
+                <div class="db-info-grid" style="margin-top:0.5rem;">
+                  <span class="db-info-label">Sektor</span><span>{{ z.sektor }}</span>
+                  <span class="db-info-label">Lokalita</span><span>{{ z.lokalita }}</span>
+                  <span class="db-info-label">Odmena</span><span>{{ z.odmena }}</span>
+                </div>
+                <p style="font-size:0.88rem;color:#64748b;margin-top:0.5rem;">{{ z.popis }}</p>
+                <button class="db-btn-sm-outline" @click="upravitZadanie(i)">Upraviť</button>
+              </div>
+            </div>
+            <div v-else class="db-empty">Zatiaľ žiadne zadania.</div>
           </div>
 
-          <div v-else-if="activeSection === 'rozpocet'">
-            <div class="db-panel">
-              <h3>PO a rozpočet</h3>
-              <div class="db-info-grid">
-                <span class="db-info-label">Schválený rozpočet</span><span>—</span>
-                <span class="db-info-label">Čerpané</span><span>—</span>
-                <span class="db-info-label">Zostatok</span><span>—</span>
+          <div v-else-if="activeSection === 'spec'" class="db-panel">
+            <h3>Technická špecifikácia</h3>
+            <div class="db-form-group">
+              <label>Nahrať dokument (PDF)</label>
+              <input type="file" accept=".pdf,.doc,.docx" @change="nahratDokument" class="db-file-input" />
+            </div>
+            <div v-if="dokumenty.length" class="db-doc-list">
+              <div v-for="(doc, i) in dokumenty" :key="i" class="db-doc-item">
+                <span>📄 {{ doc.name }}</span>
+                <button class="db-btn-danger" @click="dokumenty.splice(i,1)">Odstrániť</button>
               </div>
             </div>
+            <div v-else class="db-empty">Žiadne dokumenty.</div>
+          </div>
+
+          <div v-else-if="activeSection === 'rozpocet'" class="db-panel">
+            <h3>PO a rozpočet</h3>
+            <div class="db-form-group"><label>Schválený rozpočet (€)</label><input class="db-input" v-model="rozpocet.schvaleny" type="number" placeholder="0" /></div>
+            <div class="db-form-group"><label>Čerpané (€)</label><input class="db-input" v-model="rozpocet.cerpane" type="number" placeholder="0" /></div>
+            <div class="db-info-grid" style="margin-top:0.5rem;">
+              <span class="db-info-label">Zostatok</span>
+              <strong style="color:#1e293b;">€ {{ (Number(rozpocet.schvaleny) - Number(rozpocet.cerpane)).toLocaleString('sk-SK') }}</strong>
+            </div>
+            <button class="db-btn" @click="ulozRozpocet">Uložiť</button>
+            <p v-if="rozpocetUlozeny" class="db-success">Rozpočet bol uložený.</p>
           </div>
 
         </template>
@@ -313,171 +268,56 @@
         <!-- ===== MENTOR ===== -->
         <template v-else-if="role === 'mentor'">
 
-          <!-- PROFIL -->
-          <div v-if="activeSection === 'profil'">
-            <div class="db-panel">
-              <h3>Môj profil</h3>
-              <div class="db-form-group">
-                <label>Meno a priezvisko</label>
-                <input class="db-input" v-model="profil.meno" type="text" />
-              </div>
-              <div class="db-form-group">
-                <label>E-mail</label>
-                <input class="db-input" v-model="profil.email" type="email" />
-              </div>
-              <div class="db-form-group">
-                <label>Heslo</label>
-                <input class="db-input" v-model="profil.heslo" type="password" placeholder="••••••••" />
-              </div>
-              <div class="db-form-group">
-                <label>Adresa</label>
-                <input class="db-input" v-model="profil.adresa" type="text" placeholder="Ulica, Mesto, PSČ" />
-              </div>
-              <div class="db-form-group">
-                <label>Telefón</label>
-                <input class="db-input" v-model="profil.telefon" type="tel" placeholder="+421 9xx xxx xxx" />
-              </div>
-              <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
-              <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
-            </div>
+          <div v-if="activeSection === 'profil'" class="db-panel">
+            <h3>Môj profil</h3>
+            <div class="db-form-group"><label>Meno a priezvisko</label><input class="db-input" v-model="profil.meno" type="text" /></div>
+            <div class="db-form-group"><label>E-mail</label><input class="db-input" v-model="profil.email" type="email" /></div>
+            <div class="db-form-group"><label>Heslo</label><input class="db-input" v-model="profil.heslo" type="password" placeholder="••••••••" /></div>
+            <div class="db-form-group"><label>Adresa</label><input class="db-input" v-model="profil.adresa" type="text" placeholder="Ulica, Mesto, PSČ" /></div>
+            <div class="db-form-group"><label>Telefón</label><input class="db-input" v-model="profil.telefon" type="tel" placeholder="+421 9xx xxx xxx" /></div>
+            <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
+            <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
           </div>
 
-          <!-- TÍMY A MÍĽNIKY -->
           <div v-else-if="activeSection === 'timy'">
-            <div v-for="(tim, i) in mentorTimy" :key="i" class="db-panel" style="margin-bottom:1rem;">
+            <!-- Pripojenie k tímu -->
+            <div class="db-panel" style="margin-bottom:1rem;">
+              <h3>Pripojiť sa k tímu</h3>
+              <p class="db-muted">Zadaj kód tímu, ktorý ti poskytol vedúci tímu.</p>
+              <div class="db-invite-row" style="margin-top:0.5rem;">
+                <input class="db-input" v-model="timKod" placeholder="Kód tímu (napr. TEAM-2025-A)" />
+                <button class="db-btn" @click="pripojitSaKTimu">Pripojiť sa</button>
+              </div>
+              <p v-if="timChyba" class="db-error">{{ timChyba }}</p>
+              <p v-if="timUspech" class="db-success">{{ timUspech }}</p>
+            </div>
+
+            <!-- Priradené tímy a míľniky -->
+            <div v-for="(t, i) in mentorTimy" :key="i" class="db-panel" style="margin-bottom:1rem;">
               <div class="db-info-grid">
-                <span class="db-info-label">Tím</span><span>{{ tim.nazov }}</span>
-                <span class="db-info-label">Projekt</span><span>{{ tim.projekt }}</span>
-                <span class="db-info-label">Program</span><span>{{ tim.program }}</span>
+                <span class="db-info-label">Tím</span><span>{{ t.nazov }}</span>
+                <span class="db-info-label">Projekt</span><span>{{ t.projekt }}</span>
+                <span class="db-info-label">Program</span><span>{{ t.program }}</span>
               </div>
               <div class="db-section-divider">Míľniky</div>
-              <div v-if="tim.milniky.length" class="db-milnik-list">
-                <div v-for="(m, mi) in tim.milniky" :key="mi" class="db-milnik-item">
+              <div v-if="t.milniky.length" class="db-milnik-list">
+                <div v-for="(m, mi) in t.milniky" :key="mi" class="db-milnik-item">
                   <span>{{ m.nazov }}</span>
                   <span :class="['db-badge', m.splneny ? 'green' : 'grey']">{{ m.splneny ? 'Splnený' : 'Čakajúci' }}</span>
                   <button v-if="!m.splneny" class="db-btn-sm-outline" @click="m.splneny = true">Schváliť</button>
                 </div>
               </div>
               <div v-else class="db-empty">Žiadne míľniky.</div>
-              <div class="db-invite-row" style="margin-top:0.75rem;">
-                <input class="db-input" v-model="tim.novyMilnik" placeholder="Názov nového míľnika" />
-                <button class="db-btn" @click="pridatMilnik(tim)">Pridať míľnik</button>
+              <div class="db-invite-row" style="margin-top:0.5rem;">
+                <input class="db-input" v-model="t.novyMilnik" placeholder="Názov nového míľnika" />
+                <button class="db-btn" @click="pridatMilnik(t)">Pridať míľnik</button>
               </div>
             </div>
             <div v-if="!mentorTimy.length" class="db-panel">
-              <div class="db-empty">Žiadne priradené tímy.</div>
+              <div class="db-empty">Nie si priradený k žiadnemu tímu.</div>
             </div>
           </div>
 
-        </template>
-
-        <!-- ===== KOMISIA ===== -->
-        <template v-else-if="role === 'komisia'">
-          <div v-if="activeSection === 'prihlášky'" class="db-panel">
-            <h3>Prihlášky na hodnotenie</h3>
-            <div class="db-empty">Žiadne prihlášky.</div>
-          </div>
-          <div v-else-if="activeSection === 'scoring'" class="db-panel">
-            <h3>Scoring / bodovanie</h3>
-            <div class="db-empty">Žiadne prihlášky na bodovanie.</div>
-          </div>
-          <div v-else-if="activeSection === 'odporucania'" class="db-panel">
-            <h3>Odporúčania</h3>
-            <div class="db-empty">Žiadne odporúčania.</div>
-          </div>
-          <div v-else-if="activeSection === 'rozhodnutia'" class="db-panel">
-            <h3>Rozhodnutia</h3>
-            <div class="db-empty">Žiadne rozhodnutia.</div>
-          </div>
-        </template>
-
-        <!-- ===== EDITOR ===== -->
-        <template v-else-if="role === 'editor'">
-          <div v-if="activeSection === 'stranky'" class="db-panel">
-            <h3>Správa stránok</h3>
-            <div class="db-empty">Žiadne stránky.</div>
-            <button class="db-btn">Pridať stránku</button>
-          </div>
-          <div v-else-if="activeSection === 'novinky'" class="db-panel">
-            <h3>Novinky</h3>
-            <div class="db-empty">Žiadne novinky.</div>
-            <button class="db-btn">Pridať novinku</button>
-          </div>
-          <div v-else-if="activeSection === 'partneri'" class="db-panel">
-            <h3>Partneri</h3>
-            <div class="db-empty">Žiadni partneri.</div>
-            <button class="db-btn">Pridať partnera</button>
-          </div>
-          <div v-else-if="activeSection === 'faq'" class="db-panel">
-            <h3>FAQ</h3>
-            <div class="db-empty">Žiadne otázky.</div>
-            <button class="db-btn">Pridať otázku</button>
-          </div>
-          <div v-else-if="activeSection === 'cta'" class="db-panel">
-            <h3>CTA bloky</h3>
-            <div class="db-empty">Žiadne CTA bloky.</div>
-          </div>
-        </template>
-
-        <!-- ===== NTI ADMIN ===== -->
-        <template v-else-if="role === 'admin'">
-          <div v-if="activeSection === 'pouzivatelia'" class="db-panel">
-            <h3>Správa používateľov</h3>
-            <div class="db-info-grid">
-              <span class="db-info-label">Celkom</span><span>0</span>
-              <span class="db-info-label">Aktívnych</span><span>0</span>
-            </div>
-            <button class="db-btn">Spravovať používateľov</button>
-          </div>
-          <div v-else-if="activeSection === 'vyzvy'" class="db-panel">
-            <h3>Výzvy a programy</h3>
-            <div class="db-empty">Žiadne výzvy.</div>
-            <button class="db-btn">Pridať výzvu</button>
-          </div>
-          <div v-else-if="activeSection === 'konfiguracia'" class="db-panel">
-            <h3>Konfigurácia systému</h3>
-            <div class="db-info-grid">
-              <span class="db-info-label">Verzia</span><span>1.0.0</span>
-              <span class="db-info-label">Prostredie</span><span>development</span>
-            </div>
-          </div>
-          <div v-else-if="activeSection === 'exporty'" class="db-panel">
-            <h3>Exporty dát</h3>
-            <button class="db-btn">Exportovať CSV</button>
-          </div>
-          <div v-else-if="activeSection === 'dashboardy'" class="db-panel">
-            <h3>Analytické dashboardy</h3>
-            <div class="db-info-grid">
-              <span class="db-info-label">Študentov</span><span>247</span>
-              <span class="db-info-label">Firiem</span><span>38</span>
-              <span class="db-info-label">Projektov</span><span>61</span>
-            </div>
-          </div>
-        </template>
-
-        <!-- ===== SUPER ADMIN ===== -->
-        <template v-else-if="role === 'superadmin'">
-          <div v-if="activeSection === 'system'" class="db-panel">
-            <h3>Systémové nastavenia</h3>
-            <div class="db-info-grid">
-              <span class="db-info-label">DB status</span><span class="db-badge green">Online</span>
-              <span class="db-info-label">API status</span><span class="db-badge green">Online</span>
-            </div>
-          </div>
-          <div v-else-if="activeSection === 'role'" class="db-panel">
-            <h3>Správa rolí</h3>
-            <div class="db-empty">Načíta sa z backendu.</div>
-            <button class="db-btn">Spravovať roly</button>
-          </div>
-          <div v-else-if="activeSection === 'audit'" class="db-panel">
-            <h3>Audit log</h3>
-            <div class="db-empty">Žiadne záznamy.</div>
-          </div>
-          <div v-else-if="activeSection === 'integracie'" class="db-panel">
-            <h3>Integrácie</h3>
-            <div class="db-empty">Žiadne integrácie.</div>
-            <button class="db-btn">Pridať integráciu</button>
-          </div>
         </template>
 
       </div>
@@ -491,39 +331,22 @@ import { useUserStore } from '../stores/user.js'
 import { useRouter } from 'vue-router'
 
 const MENU_CONFIG = [
-  { key: 'profil',       label: 'Môj profil',        icon: '👤', roles: ['student', 'vedouci', 'firma', 'mentor'] },
-  { key: 'prihlaška',    label: 'Prihláška',          icon: '📋', roles: ['student', 'vedouci'] },
-  { key: 'dokumenty',    label: 'Dokumenty',          icon: '📁', roles: ['student', 'firma'] },
-  { key: 'tim',          label: 'Môj tím',            icon: '👥', roles: ['vedouci'] },
-  { key: 'komunikacia',  label: 'Komunikácia s NTI',  icon: '💬', roles: ['vedouci'] },
-  { key: 'zadania',      label: 'Zadania',            icon: '📝', roles: ['firma'] },
-  { key: 'spec',         label: 'Tech. špecifikácia', icon: '⚙️',  roles: ['firma'] },
-  { key: 'rozpocet',     label: 'PO a rozpočet',      icon: '💰', roles: ['firma'] },
-  { key: 'timy',         label: 'Tímy a míľniky',    icon: '🏁', roles: ['mentor'] },
-  { key: 'prihlášky',    label: 'Prihlášky',          icon: '📂', roles: ['komisia'] },
-  { key: 'scoring',      label: 'Scoring',            icon: '⭐', roles: ['komisia'] },
-  { key: 'odporucania',  label: 'Odporúčania',        icon: '✅', roles: ['komisia'] },
-  { key: 'rozhodnutia',  label: 'Rozhodnutia',        icon: '⚖️',  roles: ['komisia'] },
-  { key: 'stranky',      label: 'Stránky',            icon: '🌐', roles: ['editor'] },
-  { key: 'novinky',      label: 'Novinky',            icon: '📰', roles: ['editor'] },
-  { key: 'partneri',     label: 'Partneri',           icon: '🤝', roles: ['editor'] },
-  { key: 'faq',          label: 'FAQ',                icon: '❓', roles: ['editor'] },
-  { key: 'cta',          label: 'CTA bloky',          icon: '🔔', roles: ['editor'] },
-  { key: 'pouzivatelia', label: 'Používatelia',       icon: '👥', roles: ['admin', 'superadmin'] },
-  { key: 'vyzvy',        label: 'Výzvy',              icon: '🚀', roles: ['admin'] },
-  { key: 'konfiguracia', label: 'Konfigurácia',       icon: '🔧', roles: ['admin', 'superadmin'] },
-  { key: 'exporty',      label: 'Exporty',            icon: '📤', roles: ['admin'] },
-  { key: 'dashboardy',   label: 'Dashboardy',         icon: '📊', roles: ['admin'] },
-  { key: 'system',       label: 'Systém',             icon: '🖥️',  roles: ['superadmin'] },
-  { key: 'role',         label: 'Roly',               icon: '🔑', roles: ['superadmin'] },
-  { key: 'audit',        label: 'Audit log',          icon: '📜', roles: ['superadmin'] },
-  { key: 'integracie',   label: 'Integrácie',         icon: '🔗', roles: ['superadmin'] },
+  { key: 'profil',      label: 'Môj profil',       icon: '👤', roles: ['student', 'vedouci', 'firma', 'mentor'] },
+  { key: 'prihlaška',   label: 'Prihláška',         icon: '📋', roles: ['student', 'vedouci'] },
+  { key: 'dokumenty',   label: 'Dokumenty',         icon: '📁', roles: ['student'] },
+  { key: 'tim',         label: 'Môj tím',           icon: '👥', roles: ['vedouci'] },
+  { key: 'komunikacia', label: 'Komunikácia s NTI', icon: '💬', roles: ['vedouci'] },
+  { key: 'zadania',     label: 'Zadania',           icon: '📝', roles: ['firma'] },
+  { key: 'spec',        label: 'Tech. špecifikácia',icon: '⚙️',  roles: ['firma'] },
+  { key: 'rozpocet',    label: 'PO a rozpočet',     icon: '💰', roles: ['firma'] },
+  { key: 'timy',        label: 'Tímy a míľniky',   icon: '🏁', roles: ['mentor'] },
 ]
 
 const ROLE_LABELS = {
-  student: 'Študent', vedouci: 'Vedúci tímu', firma: 'Firma / partner',
-  mentor: 'Mentor', komisia: 'Komisia', editor: 'Editor obsahu',
-  admin: 'NTI Administrátor', superadmin: 'Super administrátor',
+  student: 'Študent',
+  vedouci: 'Vedúci tímu',
+  firma: 'Firma / partner',
+  mentor: 'Mentor',
 }
 
 export default {
@@ -579,7 +402,7 @@ export default {
     const tim = ref({
       nazov: 'Môj tím',
       program: '—',
-      clenovia: [{ meno: userStore.meno, telefon: userStore.telefon || '—' }],
+      clenovia: [{ meno: userStore.meno, telefon: '' }],
     })
     const novyClen = ref({ meno: '', telefon: '' })
     function pozvatClena() {
@@ -599,26 +422,76 @@ export default {
       novaSpravaText.value = ''
       await nextTick()
       if (chatEl.value) chatEl.value.scrollTop = chatEl.value.scrollHeight
-      // TODO: odoslať na backend, načítať odpoveď
+      // TODO: backend
     }
 
-    // --- MENTOR TÍMY ---
-    const mentorTimy = ref([
-      {
-        nazov: 'Tím Alpha',
-        projekt: 'EcoFlow App',
-        program: 'Program A',
-        novyMilnik: '',
-        milniky: [
-          { nazov: 'Definícia MVP', splneny: true },
-          { nazov: 'Prvý prototyp', splneny: false },
-        ],
-      },
-    ])
-    function pridatMilnik(tim) {
-      if (!tim.novyMilnik.trim()) return
-      tim.milniky.push({ nazov: tim.novyMilnik, splneny: false })
-      tim.novyMilnik = ''
+    // --- FIRMA: ZADANIA ---
+    const firemneZadania = ref([])
+    const editZadanie = ref(null) // index upravovaného zadania, null = nové
+    const zadanieUlozene = ref(false)
+    const zadanieForm = ref({ nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' })
+
+    function ulozZadanie() {
+      if (!zadanieForm.value.nazov.trim()) return
+      if (editZadanie.value !== null) {
+        firemneZadania.value[editZadanie.value] = { ...zadanieForm.value }
+        editZadanie.value = null
+      } else {
+        firemneZadania.value.push({ ...zadanieForm.value })
+      }
+      zadanieForm.value = { nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' }
+      zadanieUlozene.value = true
+      setTimeout(() => { zadanieUlozene.value = false }, 2500)
+    }
+
+    function upravitZadanie(i) {
+      editZadanie.value = i
+      zadanieForm.value = { ...firemneZadania.value[i] }
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    function zrusitEditZadanie() {
+      editZadanie.value = null
+      zadanieForm.value = { nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' }
+    }
+
+    // --- FIRMA: ROZPOČET ---
+    const rozpocet = ref({ schvaleny: '', cerpane: '' })
+    const rozpocetUlozeny = ref(false)
+    function ulozRozpocet() {
+      rozpocetUlozeny.value = true
+      setTimeout(() => { rozpocetUlozeny.value = false }, 2500)
+      // TODO: backend
+    }
+
+    // --- MENTOR: TÍMY ---
+    const mentorTimy = ref([])
+    const timKod = ref('')
+    const timChyba = ref('')
+    const timUspech = ref('')
+
+    // Simulácia dostupných tímov — TODO: nahradiť backendom
+    const dostupneTimy = [
+      { kod: 'TEAM-2025-A', nazov: 'Tím Alpha', projekt: 'EcoFlow App', program: 'Program A', novyMilnik: '', milniky: [{ nazov: 'Definícia MVP', splneny: true }, { nazov: 'Prvý prototyp', splneny: false }] },
+      { kod: 'TEAM-2025-B', nazov: 'Tím Beta', projekt: 'AgroSense Dashboard', program: 'Program B', novyMilnik: '', milniky: [] },
+    ]
+
+    function pripojitSaKTimu() {
+      timChyba.value = ''
+      timUspech.value = ''
+      const najdeny = dostupneTimy.find(t => t.kod === timKod.value.trim())
+      if (!najdeny) { timChyba.value = 'Tím s týmto kódom neexistuje.'; return }
+      if (mentorTimy.value.find(t => t.kod === najdeny.kod)) { timChyba.value = 'K tomuto tímu si už priradený.'; return }
+      mentorTimy.value.push({ ...najdeny })
+      timKod.value = ''
+      timUspech.value = `Bol si pridaný k tímu "${najdeny.nazov}".`
+      setTimeout(() => { timUspech.value = '' }, 3000)
+    }
+
+    function pridatMilnik(t) {
+      if (!t.novyMilnik.trim()) return
+      t.milniky.push({ nazov: t.novyMilnik, splneny: false })
+      t.novyMilnik = ''
     }
 
     return {
@@ -629,7 +502,9 @@ export default {
       dokumenty, nahratDokument,
       tim, novyClen, pozvatClena,
       chatSpravy, novaSpravaText, chatEl, odoslatSpravu,
-      mentorTimy, pridatMilnik,
+      firemneZadania, editZadanie, zadanieUlozene, zadanieForm, ulozZadanie, upravitZadanie, zrusitEditZadanie,
+      rozpocet, rozpocetUlozeny, ulozRozpocet,
+      mentorTimy, timKod, timChyba, timUspech, pripojitSaKTimu, pridatMilnik,
     }
   }
 }
@@ -671,7 +546,7 @@ export default {
 .db-info-grid { display: grid; grid-template-columns: 160px 1fr; gap: 0.5rem 1rem; align-items: center; }
 .db-info-label { font-size: 0.85rem; color: #64748b; font-weight: 500; }
 
-.db-section-divider { font-size: 0.78rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.25rem 0; border-top: 1px solid #f1f5f9; margin-top: 0.25rem; }
+.db-section-divider { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.25rem 0; border-top: 1px solid #f1f5f9; margin-top: 0.25rem; }
 
 .db-badge { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
 .db-badge.green { background: #dcfce7; color: #16a34a; }
@@ -681,7 +556,8 @@ export default {
 .db-btn { align-self: flex-start; padding: 0.55rem 1.2rem; background: #c8972a; color: #fff; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit; }
 .db-btn:hover { background: #a87820; }
 .db-btn-sm { display: inline-block; margin-top: 0.5rem; padding: 0.4rem 0.9rem; background: #c8972a; color: #fff; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
-.db-btn-sm-outline { padding: 0.3rem 0.7rem; background: none; border: 1px solid #c8972a; color: #c8972a; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
+.db-btn-sm-outline { align-self: flex-start; padding: 0.35rem 0.8rem; background: none; border: 1px solid #c8972a; color: #c8972a; border-radius: 6px; font-size: 0.82rem; cursor: pointer; font-family: inherit; }
+.db-btn-outline { padding: 0.5rem 1rem; background: none; border: 1px solid #e2e8f0; color: #64748b; border-radius: 8px; font-size: 0.88rem; cursor: pointer; font-family: inherit; }
 .db-btn-danger { padding: 0.3rem 0.7rem; background: none; border: 1px solid #fca5a5; color: #dc2626; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
 .db-btn-danger-sm { background: none; border: none; color: #94a3b8; font-size: 0.9rem; cursor: pointer; padding: 0 0.3rem; }
 .db-btn-danger-sm:hover { color: #dc2626; }
@@ -689,8 +565,9 @@ export default {
 .db-empty { font-size: 0.9rem; color: #94a3b8; padding: 1rem; background: #f8fafc; border-radius: 8px; text-align: center; border: 1px dashed #e2e8f0; }
 .db-muted { font-size: 0.9rem; color: #94a3b8; margin: 0; }
 .db-success { font-size: 0.88rem; color: #16a34a; margin: 0; }
+.db-error { font-size: 0.88rem; color: #dc2626; margin: 0; }
 
-.db-prog-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.db-prog-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem; }
 .db-prog-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 1rem; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; gap: 0.3rem; }
 .db-prog-card:hover { border-color: #c8972a; box-shadow: 0 2px 12px rgba(200,151,42,0.1); }
 .db-prog-tag { font-size: 0.7rem; font-weight: 700; color: #c8972a; text-transform: uppercase; letter-spacing: 0.1em; }
@@ -717,6 +594,10 @@ export default {
 .db-chat-time { font-size: 0.7rem; color: #cbd5e1; }
 .db-chat-input-row { display: flex; gap: 0.5rem; }
 .db-chat-input-row .db-input { flex: 1; }
+
+.db-zadanie-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.2rem; max-width: 640px; margin-bottom: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.db-zadanie-header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.db-zadanie-header strong { font-size: 0.98rem; color: #1e293b; }
 
 .db-milnik-list { display: flex; flex-direction: column; gap: 0.5rem; }
 .db-milnik-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; background: #f8fafc; border-radius: 8px; font-size: 0.88rem; }
