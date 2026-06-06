@@ -28,14 +28,6 @@
       </div>
     </section>
 
-    <section class="stats">
-      <div class="stat"><span class="stat-num">{{ store.stats.students }}</span><span class="stat-label">Študentov</span></div>
-      <div class="stat-divider"></div>
-      <div class="stat"><span class="stat-num">{{ store.stats.firms }}</span><span class="stat-label">Firiem</span></div>
-      <div class="stat-divider"></div>
-      <div class="stat"><span class="stat-num">{{ store.stats.projects }}</span><span class="stat-label">Projektov</span></div>
-    </section>
-
     <section class="home-about">
       <div class="home-about-inner">
         <div class="home-about-text">
