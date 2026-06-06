@@ -54,13 +54,9 @@ import AppFooter from '../components/AppFooter.vue'
 // Dočasní testovacie účty — nahradiť volaním backendu
 const TEST_USERS = [
   { email: 'student@nti.sk',    heslo: 'admin', role: 'student',    meno: 'Ján Novák' },
-  { email: 'vedouci@nti.sk',    heslo: 'admin', role: 'vedouci',    meno: 'Petra Hlavná' },
+  { email: 'veduci@nti.sk',    heslo: 'admin', role: 'vedouci',    meno: 'Petra Hlavná' },
   { email: 'firma@nti.sk',      heslo: 'admin', role: 'firma',      meno: 'TechNitra s.r.o.' },
   { email: 'mentor@nti.sk',     heslo: 'admin', role: 'mentor',     meno: 'Dominik Halvoník' },
-  { email: 'komisia@nti.sk',    heslo: 'admin', role: 'komisia',    meno: 'Eva Komisárová' },
-  { email: 'editor@nti.sk',     heslo: 'admin', role: 'editor',     meno: 'Martin Editor' },
-  { email: 'admin@nti.sk',      heslo: 'admin', role: 'admin',      meno: 'NTI Admin' },
-  { email: 'superadmin@nti.sk', heslo: 'admin', role: 'superadmin', meno: 'Super Admin' },
 ]
 
 export default {

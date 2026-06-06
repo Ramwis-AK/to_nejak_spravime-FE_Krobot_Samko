@@ -18,6 +18,7 @@ const router = createRouter({
     { path: '/registracia', name: 'registracia', component: () => import('../views/RegistraciaView.vue') },
     { path: '/registracia/:role', name: 'reg-form', component: () => import('../views/RegistraciaformView.vue') },
     { path: '/dashboard', name: 'Dashboard', component: () => import('../views/DashboardView.vue') },
+    { path: '/dashboard/prihlaska-form', name: 'prihlaska-form', component: () => import('../views/PrihlaskaFormView.vue') },
   ],
 })
 

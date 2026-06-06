@@ -23,8 +23,7 @@ export const useNtiStore = defineStore('nti', {
       { key: 'student', name: 'Študent', desc: 'Jednotlivec uchádzajúci sa o prax alebo prácu v StartUpe' },
       { key: 'vedouci', name: 'Vedúci tímu', desc: 'Jednotlivec s právom správy tímu alebo zakladajúci StartUp' },
       { key: 'firma', name: 'Firma / partner', desc: 'Organizácia zadávajúca výzvu pre prax alebo zakladajúca StartUp' },
-      { key: 'mentor', name: 'Mentor', desc: 'Osoba sprevádzajúca projekt alebo tím' },
-      { key: 'komisia', name: 'Komisia / evaluator', desc: 'Hodnotiteľ prihlášok' }
+      { key: 'mentor', name: 'Mentor', desc: 'Osoba sprevádzajúca projekt alebo tím' }
     ],
     partneri: [
       { id: 1, nazov: 'UKF Nitra', typ: 'Akademický', popis: 'Univerzita Konštantína Filozofa v Nitre — zakladajúci akademický partner programu.' },
