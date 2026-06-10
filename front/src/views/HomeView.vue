@@ -75,6 +75,8 @@ import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
 import SectionHeader from '../components/SectionHeader.vue'
 
+import { onMounted } from 'vue'
+
 export default {
   name: 'HomeView',
   components: { AppFooter, SectionHeader },
@@ -82,6 +84,10 @@ export default {
     // Inicializácia storov
     const store = useNtiStore()
     const userStore = useUserStore()
+
+    onMounted(() => {
+  store.fetchNovinky()
+})
 
     // Statické dáta pre piliere
     const piliere = [

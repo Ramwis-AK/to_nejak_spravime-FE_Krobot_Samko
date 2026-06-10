@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+import { apiGet } from '../api.js'
+
 export const useNtiStore = defineStore('nti', {
   state: () => ({
     startups: [
@@ -34,12 +36,7 @@ export const useNtiStore = defineStore('nti', {
       { id: 3, meno: 'Martin Blaho', oblast: 'Biznis & Financie', skusenosti: 'Investor, 3 exits' },
       { id: 4, meno: 'Peter Šimko', oblast: 'AI & Dáta', skusenosti: 'PhD, ML engineer' },
     ],
-    novinky: [
-      { id: 1, titul: 'NTI otvára jesenné kolo Programu A', datum: '2025-09-01', perex: 'Registrácia pre tímy s vlastným inovatívnym nápadom je otvorená do 15. októbra 2025.', kategoria: 'Oznámenie' },
-      { id: 2, titul: 'EcoFlow získal €200k ARR — úspešný exit z inkubátora', datum: '2025-08-15', perex: 'Startup EcoFlow, ktorý prešiel Programom A, oznámil prvý veľký míľnik v oblasti udržateľnej energie.', kategoria: 'Úspešný príbeh' },
-      { id: 3, titul: 'Nové firemné zadania v Programme B pre Q4', datum: '2025-07-20', perex: 'TechNitra, MedCenter SK a ďalšie spoločnosti zverejnili nové zadania pre študentské tímy.', kategoria: 'Program B' },
-      { id: 4, titul: 'Workshopy k tvorbe Executive Summary — september 2025', datum: '2025-09-10', perex: 'Séria bezplatných workshopov pre tímy prihlasujúce sa do Programu A.', kategoria: 'Udalosť' },
-    ],
+    novinky: [],
 
     // --- ZDIEĽANÉ ENTITY (firma → zadania, vedúci → tímy) ---
     // Firma vytvára zadania, každé má unikátny kód ZAD-XXXX
@@ -146,5 +143,8 @@ export const useNtiStore = defineStore('nti', {
       const tim = this.timy.find(t => t.kod === timKod)
       if (tim) tim.clenovia.push(clen)
     },
+  async fetchNovinky() {
+  this.novinky = await apiGet('/novinky')
+},
   },
 })
