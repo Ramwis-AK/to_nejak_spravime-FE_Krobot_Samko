@@ -46,12 +46,12 @@ import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
 import PageHero from '../components/PageHero.vue'
 import SectionHeader from '../components/SectionHeader.vue'
+import CtaSection from '../components/CtaSection.vue'
 export default {
   name: 'PartneriView',
-  components: { AppFooter, PageHero, SectionHeader },
+  components: { AppFooter, PageHero, SectionHeader, CtaSection },
   setup() {
     const store = useNtiStore()
-    // Načítaj partnerov aj mentorov pri otvorení stránky
     onMounted(() => {
       store.fetchPartneri()
       store.fetchMentori()
@@ -60,6 +60,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
 .part-section { padding: 5rem 2.5rem; background: var(--white); }
 .part-section-alt { background: var(--surface); }
