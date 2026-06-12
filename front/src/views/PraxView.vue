@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
 import PageHero from '../components/PageHero.vue'
@@ -59,6 +59,8 @@ export default {
       { key: 'zadanie', label: 'Zadanie' },
       { key: 'odmena', label: 'Odmena tímu' },
     ]
+    // Načítaj zadania (prax) z backendu pri otvorení stránky
+    onMounted(() => store.fetchPraxe())
     const filtered = computed(() => {
       let list = store.praxe
       if (activeFilter.value !== 'all') list = list.filter(p => p.stavKey === activeFilter.value)

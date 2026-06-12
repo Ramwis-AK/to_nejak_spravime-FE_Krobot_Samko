@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
 import FilterBar from '../components/FilterBar.vue'
@@ -34,6 +34,8 @@ export default {
   setup() {
     const store = useNtiStore()
     const activeFilter = ref('Všetky')
+    // Načítaj novinky z backendu
+    onMounted(() => store.fetchNovinky())
     const kategorie = computed(() => ['Všetky', ...new Set(store.novinky.map(n => n.kategoria))])
     const filtered = computed(() => activeFilter.value === 'Všetky' ? store.novinky : store.novinky.filter(n => n.kategoria === activeFilter.value))
     return { activeFilter, kategorie, filtered }

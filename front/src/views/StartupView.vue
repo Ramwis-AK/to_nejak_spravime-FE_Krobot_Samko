@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
 import PageHero from '../components/PageHero.vue'
@@ -54,6 +54,8 @@ export default {
       { key: 'vp', label: 'Value proposition' },
       { key: 'investicia', label: 'Investícia' },
     ]
+    // Načítaj startupy z backendu pri otvorení stránky
+    onMounted(() => store.fetchStartups())
     const filtered = computed(() => {
       let list = store.startups
       if (activeFilter.value !== 'Všetky') list = list.filter(s => s.faza === activeFilter.value)

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
@@ -29,7 +29,17 @@ export default {
   setup() {
     const store = useNtiStore()
     const route = useRoute()
-    return { novinka: computed(() => store.getNovinkaById(route.params.id)) }
+    const novinka = ref(null)
+
+    onMounted(async () => {
+      try {
+        novinka.value = await store.fetchNovinka(route.params.id)
+      } catch (e) {
+        novinka.value = null
+      }
+    })
+
+    return { novinka }
   }
 }
 </script>

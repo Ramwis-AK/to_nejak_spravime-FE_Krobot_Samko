@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useNtiStore } from '../stores/nti.js'
 import { useUserStore } from '../stores/user.js'
@@ -51,7 +51,16 @@ export default {
     const store = useNtiStore()
     const userStore = useUserStore()
     const route = useRoute()
-    const prax = computed(() => store.getPraxById(route.params.id))
+    const prax = ref(null)
+
+    onMounted(async () => {
+      try {
+        prax.value = await store.fetchPrax(route.params.id)
+      } catch (e) {
+        prax.value = null
+      }
+    })
+
     const rows = computed(() => prax.value ? [
       { label: 'Sektor', value: prax.value.sektor },
       { label: 'Lokalita', value: prax.value.lokalita },
@@ -62,6 +71,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .detail-section {

@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useNtiStore } from '../stores/nti.js'
 import AppFooter from '../components/AppFooter.vue'
@@ -45,7 +45,17 @@ export default {
   setup() {
     const store = useNtiStore()
     const route = useRoute()
-    const startup = computed(() => store.getStartupById(route.params.id))
+    const startup = ref(null)   // sem uložíme načítaný startup
+
+    // Načítaj jeden startup podľa ID z URL. Ak neexistuje (404), ostane null.
+    onMounted(async () => {
+      try {
+        startup.value = await store.fetchStartup(route.params.id)
+      } catch (e) {
+        startup.value = null
+      }
+    })
+
     const rows = computed(() => startup.value ? [
       { label: 'Oblasť', value: startup.value.oblast },
       { label: 'Fáza', value: startup.value.faza },

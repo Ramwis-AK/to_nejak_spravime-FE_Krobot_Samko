@@ -85,18 +85,33 @@
 
 <script>
 import { ref, reactive } from 'vue'
+import { apiPost } from '../api.js'
 import AppFooter from '../components/AppFooter.vue'
 export default {
   name: 'KontaktView',
   components: { AppFooter },
   setup() {
     const sent = ref(false)
+    const chyba = ref('')
     const form = reactive({ meno: '', email: '', telefon: '', tema: '', sprava: '' })
-    const handleSend = () => {
-      if (!form.meno || !form.email || !form.sprava) return
-      sent.value = true
+
+    const handleSend = async () => {
+      chyba.value = ''
+      // Základná kontrola na strane klienta (povinné polia)
+      if (!form.meno || !form.email || !form.sprava) {
+        chyba.value = 'Vyplňte meno, e-mail a správu.'
+        return
+      }
+      try {
+        // Odoslanie na backend; ten dáta znova zvaliduje a uloží
+        await apiPost('/kontakt', { ...form })
+        sent.value = true
+      } catch (e) {
+        chyba.value = e.message
+      }
     }
-    return { form, sent, handleSend }
+
+    return { form, sent, chyba, handleSend }
   }
 }
 </script>
