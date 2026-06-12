@@ -1,4 +1,3 @@
-// Centrálny API klient pre komunikáciu s Laravel backendom
 const BASE = 'http://127.0.0.1:8000/api'
 
 // GET požiadavka
@@ -10,19 +9,16 @@ export async function apiGet(path) {
   return res.json()
 }
 
-// POST požiadavka (napr. odoslanie formulára)
+// POST požiadavka (formulár). 422 = validačná chyba, 429 = príliš veľa pokusov (rate limit)
 export async function apiPost(path, body) {
   const res = await fetch(`${BASE}${path}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body: JSON.stringify(body),
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
-    // Laravel pri validačnej chybe (422) vracia `message`
+    if (res.status === 429) throw new Error('Príliš veľa pokusov, skúste o chvíľu.')
     throw new Error(data.message || `Chyba ${res.status}`)
   }
   return data

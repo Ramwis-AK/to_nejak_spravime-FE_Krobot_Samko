@@ -74,6 +74,13 @@
               <label>Správa *</label>
               <textarea v-model="form.sprava" placeholder="Napíšte vašu správu..." rows="5"></textarea>
             </div>
+            <div class="form-group">
+              <label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.82rem;">
+                <input v-model="form.gdpr" type="checkbox" />
+                  Súhlasím so spracovaním osobných údajov v súlade s GDPR. *
+              </label>
+            </div>
+            <p v-if="chyba" style="color:#dc2626;font-size:0.85rem;margin-bottom:0.5rem;">{{ chyba }}</p>
             <button class="btn-primary" style="width:100%;" @click="handleSend">Odoslať správu →</button>
           </template>
         </div>
@@ -93,17 +100,20 @@ export default {
   setup() {
     const sent = ref(false)
     const chyba = ref('')
-    const form = reactive({ meno: '', email: '', telefon: '', tema: '', sprava: '' })
+    // gdpr: povinný súhlas (§13)
+    const form = reactive({ meno: '', email: '', telefon: '', tema: '', sprava: '', gdpr: false })
 
     const handleSend = async () => {
       chyba.value = ''
-      // Základná kontrola na strane klienta (povinné polia)
       if (!form.meno || !form.email || !form.sprava) {
         chyba.value = 'Vyplňte meno, e-mail a správu.'
         return
       }
+      if (!form.gdpr) {
+        chyba.value = 'Potvrďte súhlas so spracovaním údajov.'
+        return
+      }
       try {
-        // Odoslanie na backend; ten dáta znova zvaliduje a uloží
         await apiPost('/kontakt', { ...form })
         sent.value = true
       } catch (e) {

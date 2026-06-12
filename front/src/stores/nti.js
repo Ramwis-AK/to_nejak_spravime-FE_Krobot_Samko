@@ -3,14 +3,12 @@ import { apiGet } from '../api.js'
 
 export const useNtiStore = defineStore('nti', {
   state: () => ({
-    // Dáta sa napĺňajú z backendu (prázdne, kým ich nenačítame)
     startups: [],
     praxe: [],
     partneri: [],
     mentori: [],
     novinky: [],
-
-    // Statické metadáta rolí (využíva registračný formulár)
+    vyzvy: [],          // výzvy a termíny (§9)
     roles: [
       { key: 'student', name: 'Študent', desc: 'Jednotlivec uchádzajúci sa o prax alebo prácu v StartUpe' },
       { key: 'vedouci', name: 'Vedúci tímu', desc: 'Jednotlivec s právom správy tímu alebo zakladajúci StartUp' },
@@ -24,15 +22,13 @@ export const useNtiStore = defineStore('nti', {
   },
 
   actions: {
-    // --- načítanie zoznamov (pre prehľadové stránky) ---
     async fetchStartups() { this.startups = await apiGet('/startups') },
     async fetchPraxe()    { this.praxe = await apiGet('/praxe') },
     async fetchPartneri() { this.partneri = await apiGet('/partneri') },
     async fetchMentori()  { this.mentori = await apiGet('/mentori') },
     async fetchNovinky()  { this.novinky = await apiGet('/novinky') },
+    async fetchVyzvy()    { this.vyzvy = await apiGet('/vyzvy') },
 
-    // --- načítanie jedného záznamu (pre detail stránky) ---
-    // Vracajú priamo dáta; detail stránka si ich uloží do lokálnej premennej.
     fetchStartup(id) { return apiGet(`/startups/${id}`) },
     fetchPrax(id)    { return apiGet(`/praxe/${id}`) },
     fetchNovinka(id) { return apiGet(`/novinky/${id}`) },
