@@ -28,9 +28,10 @@ export const useNtiStore = defineStore('nti', {
     async fetchMentori()  { this.mentori = await apiGet('/mentori') },
     async fetchNovinky()  { this.novinky = await apiGet('/novinky') },
     async fetchVyzvy()    { this.vyzvy = await apiGet('/vyzvy') },
-
+    
     fetchStartup(id) { return apiGet(`/startups/${id}`) },
     fetchPrax(id)    { return apiGet(`/praxe/${id}`) },
     fetchNovinka(id) { return apiGet(`/novinky/${id}`) },
+    fetchVyzva(id) { return apiGet(`/vyzvy/${id}`) },
   },
 })

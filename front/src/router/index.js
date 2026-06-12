@@ -13,6 +13,7 @@ const router = createRouter({
     { path: '/prax/:id', name: 'prax-detail', component: () => import('../views/PraxdetailView.vue') },
     { path: '/partneri', name: 'partneri', component: () => import('../views/PartnerView.vue') },
     { path: '/vyzvy', name: 'vyzvy', component: () => import('../views/VyzvyView.vue') },
+    { path: '/vyzvy/:id', name: 'vyzva-detail', component: () => import('../views/VyzvaDetailView.vue') },
     { path: '/novinky', name: 'novinky', component: () => import('../views/NovinkyView.vue') },
     { path: '/novinky/:id', name: 'novinka-detail', component: () => import('../views/NovinkaDetailView.vue') },
     { path: '/kontakt', name: 'kontakt', component: () => import('../views/KontaktView.vue') },

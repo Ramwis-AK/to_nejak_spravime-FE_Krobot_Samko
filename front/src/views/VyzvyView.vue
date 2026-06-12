@@ -4,14 +4,13 @@
       sub="Aktívne kolá programov a kľúčové dátumy. Nezmeškaj deadline." />
 
     <div class="vyzvy-page">
-      <!-- Stav načítania / chyby -->
       <p v-if="loading" class="vyzvy-info">Načítavam výzvy...</p>
       <p v-else-if="chyba" class="vyzvy-info vyzvy-err">{{ chyba }}</p>
       <p v-else-if="!store.vyzvy.length" class="vyzvy-info">Žiadne aktívne výzvy.</p>
 
-      <!-- Zoznam výziev -->
       <div v-else class="vyzvy-list">
-        <div v-for="v in store.vyzvy" :key="v.id" class="vyzva-card">
+        <!-- celá karta je odkaz na detail /vyzvy/:id -->
+        <RouterLink v-for="v in store.vyzvy" :key="v.id" :to="`/vyzvy/${v.id}`" class="vyzva-card">
           <div class="vyzva-top">
             <span class="tag">{{ v.program }}</span>
             <span :class="['vyzva-stav', v.stav === 'Otvorená' ? 'open' : 'closed']">{{ v.stav }}</span>
@@ -19,7 +18,8 @@
           <h3>{{ v.nazov }}</h3>
           <p v-if="v.popis">{{ v.popis }}</p>
           <div class="vyzva-deadline">Deadline: <strong>{{ v.deadline }}</strong></div>
-        </div>
+          <span class="vyzva-arrow">Zobraziť detail →</span>
+        </RouterLink>
       </div>
     </div>
 
@@ -39,8 +39,6 @@ export default {
     const store = useNtiStore()
     const loading = ref(true)
     const chyba = ref('')
-
-    // Načítaj výzvy z backendu pri otvorení stránky + ošetri chybu
     onMounted(async () => {
       try {
         await store.fetchVyzvy()
@@ -50,7 +48,6 @@ export default {
         loading.value = false
       }
     })
-
     return { store, loading, chyba }
   }
 }
@@ -61,7 +58,8 @@ export default {
 .vyzvy-info { color: var(--text-muted); padding: 1.5rem 0; }
 .vyzvy-err { color: #dc2626; }
 .vyzvy-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
-.vyzva-card { border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; background: var(--white); display: flex; flex-direction: column; gap: 0.6rem; }
+.vyzva-card { border: 1px solid var(--border); border-radius: 6px; padding: 1.5rem; background: var(--white); display: flex; flex-direction: column; gap: 0.6rem; text-decoration: none; color: var(--text); transition: all 0.2s; }
+.vyzva-card:hover { border-color: var(--navy); box-shadow: 0 4px 16px rgba(10,22,40,0.08); }
 .vyzva-top { display: flex; justify-content: space-between; align-items: center; }
 .vyzva-card h3 { font-size: 1rem; color: var(--navy); font-weight: 500; }
 .vyzva-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; flex: 1; }
@@ -69,5 +67,6 @@ export default {
 .vyzva-stav.open { background: #dcfce7; color: #16a34a; }
 .vyzva-stav.closed { background: #f1f5f9; color: #64748b; }
 .vyzva-deadline { font-size: 0.82rem; color: var(--text); border-top: 1px solid var(--border); padding-top: 0.6rem; }
+.vyzva-arrow { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
 @media (max-width: 600px) { .vyzvy-page { padding: 2rem 1.25rem; } }
 </style>
