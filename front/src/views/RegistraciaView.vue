@@ -51,14 +51,6 @@ import { useUserStore } from '../stores/user.js'
 import { useRouter } from 'vue-router'
 import AppFooter from '../components/AppFooter.vue'
 
-// Dočasní testovacie účty — nahradiť volaním backendu
-const TEST_USERS = [
-  { email: 'student@nti.sk',    heslo: 'admin', role: 'student',    meno: 'Ján Novák' },
-  { email: 'veduci@nti.sk',    heslo: 'admin', role: 'vedouci',    meno: 'Petra Hlavná' },
-  { email: 'firma@nti.sk',      heslo: 'admin', role: 'firma',      meno: 'TechNitra s.r.o.' },
-  { email: 'mentor@nti.sk',     heslo: 'admin', role: 'mentor',     meno: 'Dominik Halvoník' },
-]
-
 export default {
   name: 'RegistraciaView',
   components: { AppFooter },
@@ -71,16 +63,15 @@ export default {
     const heslo = ref('')
     const chyba = ref('')
 
-    function prihlasit() {
+    async function prihlasit() {
       chyba.value = ''
-      // TODO: nahradiť volaním backendu
-      const user = TEST_USERS.find(u => u.email === email.value && u.heslo === heslo.value)
-      if (!user) {
-        chyba.value = 'Nesprávny e-mail alebo heslo.'
-        return
+      if (!email.value || !heslo.value) { chyba.value = 'Vyplň e-mail a heslo.'; return }
+      try {
+        await userStore.login(email.value, heslo.value)
+        router.push('/dashboard')
+      } catch (e) {
+        chyba.value = e.message
       }
-      userStore.setUser({ role: user.role, meno: user.meno, email: user.email })
-      router.push('/dashboard')
     }
 
     return { store, mode, email, heslo, chyba, prihlasit }

@@ -57,6 +57,7 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user.js'
+import { useNtiStore } from '../stores/nti.js'
 
 export default {
   name: 'PrihlaskaFormView',
@@ -64,30 +65,34 @@ export default {
     const route = useRoute()
     const router = useRouter()
     const userStore = useUserStore()
+    const ntiStore = useNtiStore()
     const program = route.query.program || 'A'
     const role = userStore.role
     const chyba = ref('')
 
-    const form = ref({
-      nazov: '',
-      popis: '',
-      oblast: '',
-      motivacia: '',
-      nazovTimu: '',
-      clenovia: [],
-    })
+    const form = ref({ nazov: '', popis: '', oblast: '', motivacia: '', nazovTimu: '', clenovia: [] })
 
-    function odoslat() {
+    async function odoslat() {
+      chyba.value = ''
       if (!form.value.nazov.trim()) { chyba.value = 'Vyplň názov projektu.'; return }
-      // TODO: odoslať na backend
-      router.push('/')
+      try {
+        await ntiStore.podatPrihlasku({
+          program,
+          nazov: form.value.nazov,
+          popis: form.value.popis,
+          oblast: form.value.oblast,
+          motivacia: form.value.motivacia,
+        })
+        router.push('/dashboard')
+      } catch (e) {
+        chyba.value = e.message
+      }
     }
 
     return { program, role, form, chyba, odoslat }
   }
 }
 </script>
-
 <style scoped>
 .pf-wrap { max-width: 620px; margin: 0 auto; padding: 2.5rem 1.5rem; }
 .pf-wrap h1 { font-size: 1.6rem; font-weight: 700; color: #1e293b; margin: 1rem 0 0.4rem; }

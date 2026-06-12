@@ -135,15 +135,18 @@
 
 <script>
 import { ref, reactive, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useNtiStore } from '../stores/nti.js'
+import { useUserStore } from '../stores/user.js'
 import AppFooter from '../components/AppFooter.vue'
 export default {
   name: 'RegistraciaFormView',
   components: { AppFooter },
   setup() {
     const store = useNtiStore()
+    const userStore = useUserStore()
     const route = useRoute()
+    const router = useRouter()
     const role = computed(() => store.getRoleByKey(route.params.role))
     const sent = ref(false)
     const chyba = ref('')
@@ -151,24 +154,37 @@ export default {
       meno: '', priezvisko: '', email: '', heslo: '', heslo2: '',
       studijnyProgram: '', rocnik: '', zrucnosti: '', program: '',
       nazovOrg: '', ico: '', sektor: '', popisOrg: '',
-      expertiza: '', skusenosti: '', gdpr: false
+      expertiza: '', skusenosti: '', gdpr: false,
     })
-    const handleSubmit = () => {
+
+    const handleSubmit = async () => {
       chyba.value = ''
-      if (!form.meno || !form.priezvisko || !form.email || !form.heslo) {
-        chyba.value = 'Vyplňte všetky povinné polia.'
-        return
+      if (!form.meno || !form.email || !form.heslo) { chyba.value = 'Vyplňte povinné polia.'; return }
+      if (form.heslo !== form.heslo2) { chyba.value = 'Heslá sa nezhodujú.'; return }
+      if (!form.gdpr) { chyba.value = 'Súhlas so spracovaním údajov je povinný.'; return }
+
+      // poskladaj payload pre backend podľa roly
+      const payload = {
+        meno: form.nazovOrg && role.value.key === 'firma' ? form.nazovOrg : form.meno,
+        priezvisko: role.value.key === 'firma' ? '' : form.priezvisko,
+        email: form.email,
+        password: form.heslo,
+        password_confirmation: form.heslo2,
+        rola: role.value.key,
+        ico: form.ico,
+        sektor: form.sektor,
+        popis: form.popisOrg || form.skusenosti || '',
       }
-      if (form.heslo !== form.heslo2) {
-        chyba.value = 'Heslá sa nezhodujú.'
-        return
+
+      try {
+        await userStore.register(payload)
+        sent.value = true
+        setTimeout(() => router.push('/dashboard'), 1200)
+      } catch (e) {
+        chyba.value = e.message
       }
-      if (!form.gdpr) {
-        chyba.value = 'Súhlas so spracovaním údajov je povinný.'
-        return
-      }
-      sent.value = true
     }
+
     return { role, form, sent, chyba, handleSubmit }
   }
 }
