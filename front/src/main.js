@@ -5,11 +5,13 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import { useUserStore } from './stores/user.js'
 
 const app = createApp(App)
 
-app.use(createPinia())
+app.use(createPinia())   // pinia musí byť pred použitím store
 app.use(router)
 
-app.mount('#app')
-
+// Obnova prihlásenia z uloženého tokenu (ak existuje), až potom mount
+const userStore = useUserStore()
+userStore.fetchMe().finally(() => app.mount('#app'))
