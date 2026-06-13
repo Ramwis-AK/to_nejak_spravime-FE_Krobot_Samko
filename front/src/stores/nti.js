@@ -33,7 +33,7 @@ export const useNtiStore = defineStore('nti', {
     async fetchPartneri() { this.partneri = await api.get('/partneri') },
     async fetchMentori()  { this.mentori = await api.get('/mentori') },
     async fetchNovinky()  { this.novinky = await api.get('/novinky') },
-    async fetchVyzvy()    { this.vyzvy = await api.get('/vyzvy') },
+    async fetchVyzvy()    { this.vyzvy = await api.get('/vyzvy') },    
 
     // detail jednej položky (vracia priamo dáta)
     fetchStartup(id) { return api.get(`/startups/${id}`) },
