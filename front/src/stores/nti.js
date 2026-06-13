@@ -73,6 +73,8 @@ export const useNtiStore = defineStore('nti', {
     pridatZadanie(data)     { return api.post('/zadania', data) },
     upravitZadanie(kod, d)  { return api.put(`/zadania/${kod}`, d) },
     zmazatZadanie(kod)      { return api.del(`/zadania/${kod}`) },
+    fetchFiremnePrihlasky()      { return api.get('/firma/prihlasky') },
+    rozhodnutPrihlasku(id, stav) { return api.patch(`/prihlasky/${id}/stav`, { stav }) },
 
     // ====================================================
     // FIRMA — ROZPOČET

@@ -65,7 +65,7 @@
           <div v-if="prihlasky.length" class="db-clenovia-list">
             <div v-for="p in prihlasky" :key="p.id" class="db-clen-item">
               <span>{{ p.nazov }} — Program {{ p.program }}</span>
-              <span class="db-badge grey">{{ p.stav }}</span>
+              <span :class="['db-badge', stavBadge(p.stav)]">{{ p.stav }}</span>
             </div>
           </div>
           <div v-else class="db-empty">Zatiaľ žiadne prihlášky.</div>
@@ -196,7 +196,36 @@
           <button class="db-btn" @click="ulozRozpocet">Uložiť</button>
           <p v-if="rozpocetUlozeny" class="db-success">Rozpočet uložený.</p>
         </div>
-
+        <!-- =================================================== -->
+        <!--       FIRMA — PRIHLÁŠKY NA ZADANIA                  -->
+        <!-- =================================================== -->
+        <div v-else-if="activeSection === 'prihlasky_firma'">
+          <div v-if="firemnePrihlasky.length">
+            <div v-for="p in firemnePrihlasky" :key="p.id" class="db-zadanie-card">
+              <div class="db-zadanie-header">
+                <strong>{{ p.student }} → {{ p.nazov }}</strong>
+                <span :class="['db-badge', stavBadge(p.stav)]">{{ p.stav }}</span>
+              </div>
+              <div class="db-info-grid" style="margin-top:0.5rem;">
+                <span class="db-info-label">E-mail</span><span>{{ p.email }}</span>
+                <span class="db-info-label">Telefón</span><span>{{ p.telefon || '—' }}</span>
+              </div>
+              <div class="db-section-divider">Dokumenty</div>
+              <div v-if="p.dokumenty.length" class="db-clenovia-list">
+                <div v-for="d in p.dokumenty" :key="d.id" class="db-clen-item">
+                  <span>📄 {{ d.nazov }}</span>
+                  <button class="db-btn-sm-outline" @click="stiahnutFiremnyDok(d)">Stiahnuť</button>
+                </div>
+              </div>
+              <div v-else class="db-empty">Žiadne dokumenty.</div>
+              <div v-if="p.stav === 'Podaná'" style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+                <button class="db-btn-sm-outline" @click="rozhodnut(p.id, 'Schválená')">Schváliť</button>
+                <button class="db-btn-danger" @click="rozhodnut(p.id, 'Zamietnuť' === 'Zamietnuť' ? 'Zamietnutá' : 'Zamietnutá')">Zamietnuť</button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="db-empty">Žiadne prihlášky.</div>
+        </div>
         <!-- =================================================== -->
         <!-- MENTOR — TÍMY, MÍĽNIKY, KONZULTÁCIE                 -->
         <!-- =================================================== -->
@@ -265,13 +294,14 @@ import { downloadFile } from '../api.js'
 
 // Položky menu — každá má zoznam rolí, ktoré ju vidia
 const MENU = [
-  { key: 'profil',     label: 'Môj profil',     icon: '👤', roles: ['student', 'firma', 'mentor'] },
-  { key: 'prihlaska',  label: 'Prihláška',      icon: '📋', roles: ['student'] },
-  { key: 'dokumenty',  label: 'Dokumenty',      icon: '📁', roles: ['student', 'firma'] },
-  { key: 'tim',        label: 'Môj tím',        icon: '👥', roles: ['student'] },
-  { key: 'zadania',    label: 'Zadania',        icon: '📝', roles: ['firma'] },
-  { key: 'rozpocet',   label: 'PO a rozpočet',  icon: '💰', roles: ['firma'] },
-  { key: 'mentorTimy', label: 'Tímy a míľniky', icon: '🏁', roles: ['mentor'] },
+  { key: 'profil',          label: 'Môj profil',     icon: '👤', roles: ['student', 'firma', 'mentor'] },
+  { key: 'prihlaska',       label: 'Prihláška',      icon: '📋', roles: ['student'] },
+  { key: 'dokumenty',       label: 'Dokumenty',      icon: '📁', roles: ['student', 'firma'] },
+  { key: 'tim',             label: 'Môj tím',        icon: '👥', roles: ['student'] },
+  { key: 'zadania',         label: 'Zadania',        icon: '📝', roles: ['firma'] },
+  { key: 'rozpocet',        label: 'PO a rozpočet',  icon: '💰', roles: ['firma'] },
+  { key: 'prihlasky_firma', label: 'Prihlášky',      icon: '📨', roles: ['firma'] },
+  { key: 'mentorTimy',      label: 'Tímy a míľniky', icon: '🏁', roles: ['mentor'] },
 ]
 
 const LABELS = { student: 'Študent', firma: 'Firma / partner', mentor: 'Mentor' }
@@ -311,11 +341,28 @@ export default {
     }
 
     // ====================================================
-    // ŠTUDENT — PRIHLÁŠKY
+    // ŠTUDENT — PRIHLÁŠKY (vlastné) + farebný stav
     // ====================================================
     const prihlasky = ref([])
     function novaPrihlaska(program) {
       router.push({ path: '/dashboard/prihlaska-form', query: { program } })
+    }
+    function stavBadge(s) {
+      if (s === 'Schválená') return 'green'
+      if (s === 'Zamietnutá') return 'red'
+      return 'grey'
+    }
+
+    // ====================================================
+    // FIRMA — PRIHLÁŠKY NA ZADANIA (schváliť / zamietnuť)
+    // ====================================================
+    const firemnePrihlasky = ref([])
+    async function rozhodnut(id, stav) {
+      chyba.value = ''
+      try {
+        await ntiStore.rozhodnutPrihlasku(id, stav)
+        firemnePrihlasky.value = await ntiStore.fetchFiremnePrihlasky()
+      } catch (e) { chyba.value = e.message }
     }
 
     // ====================================================
@@ -341,6 +388,10 @@ export default {
     async function zmazatDokument(id) {
       try { await ntiStore.zmazatDokument(id); dokumenty.value = await ntiStore.fetchDokumenty() }
       catch (err) { chyba.value = err.message }
+    }
+    async function stiahnutFiremnyDok(d) {
+      try { await downloadFile(`/firma/dokumenty/${d.id}/stiahnut`, d.nazov) }
+      catch (e) { chyba.value = e.message }
     }
 
     // ====================================================
@@ -471,6 +522,7 @@ export default {
         if (role.value === 'firma') {
           zadania.value = await ntiStore.fetchZadania()
           dokumenty.value = await ntiStore.fetchDokumenty()
+          firemnePrihlasky.value = await ntiStore.fetchFiremnePrihlasky()
           const r = await ntiStore.fetchRozpocet()
           rozpocet.schvaleny = r.schvaleny || 0
           rozpocet.cerpane = r.cerpane || 0
@@ -487,18 +539,20 @@ export default {
       // profil
       profil, profilUlozene, ulozProfil,
       // študent
-      prihlasky, novaPrihlaska,
-      dokumenty, nahratDokument, stiahnut, zmazatDokument,
+      prihlasky, novaPrihlaska, stavBadge,
+      dokumenty, nahratDokument, stiahnut, zmazatDokument, stiahnutFiremnyDok,
       mojTim, novyTim, novyClen, skopirovane, vytvoritTim, pridatClena, kopirovat, rozpustitTim,
       // firma
       zadania, zadanieForm, editKod, ulozZadanie, upravit, zrusitEdit, zmazat,
       rozpocet, rozpocetUlozeny, ulozRozpocet,
+      firemnePrihlasky, rozhodnut,
       // mentor
       mentorTimy, timKod, mentorChyba, mentorUspech, novyMilnik, novaKonzultacia, pripojit, pridatMilnik, schvalit, pridatKonzultaciu,
     }
   }
 }
 </script>
+
 
 <style scoped>
 .db-layout { display: flex; min-height: calc(100vh - 60px); background: #f8fafc; }

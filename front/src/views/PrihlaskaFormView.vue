@@ -1,3 +1,4 @@
+<!-- front/src/views/PrihlaskaFormView.vue — <template> -->
 <template>
   <div class="page-content">
     <div class="pf-wrap">
@@ -6,22 +7,19 @@
       <p class="pf-sub">Vyber projekt z ponuky. Motivačný list a CV sú voliteľné.</p>
 
       <div class="pf-form">
-        <!-- Výber projektu z ponuky -->
         <div class="pf-group">
           <label>Projekt *</label>
-          <select class="pf-input" v-model="vybranyProjekt">
-            <option value="">— Vyber projekt —</option>
-            <option v-for="p in ponuka" :key="p" :value="p">{{ p }}</option>
+          <select class="pf-input" v-model="vybrany">
+            <option :value="null">— Vyber projekt —</option>
+            <option v-for="(p, i) in ponuka" :key="i" :value="p">{{ p.label }}</option>
           </select>
         </div>
 
-        <!-- Voliteľný motivačný list (súbor) -->
         <div class="pf-group">
           <label>Motivačný list (voliteľné, PDF/DOC)</label>
           <input type="file" accept=".pdf,.doc,.docx" @change="e => motivList = e.target.files[0]" />
         </div>
 
-        <!-- Voliteľné CV / iný dokument -->
         <div class="pf-group">
           <label>CV alebo iný dokument (voliteľné, PDF/DOC)</label>
           <input type="file" accept=".pdf,.doc,.docx" @change="e => cvSubor = e.target.files[0]" />
@@ -53,27 +51,25 @@ export default {
     const ntiStore = useNtiStore()
     const program = route.query.program || 'A'
 
-    const ponuka = ref([])          // zoznam ponúkaných projektov
-    const vybranyProjekt = ref('')
-    const motivList = ref(null)     // voliteľný súbor
-    const cvSubor = ref(null)       // voliteľný súbor
+    const ponuka = ref([])          // [{ id, label }]
+    const vybrany = ref(null)       // vybraná položka z ponuky
+    const motivList = ref(null)
+    const cvSubor = ref(null)
     const chyba = ref('')
     const odosielam = ref(false)
 
-    // Načítaj ponuku projektov podľa programu (A = startupy, B = prax)
     onMounted(async () => {
       try {
         if (program === 'A') {
-          const startupy = await ntiStore.fetchStartupyRaw()
-          ponuka.value = startupy.map(s => s.nazov)
+          const s = await ntiStore.fetchStartupyRaw()
+          ponuka.value = s.map(x => ({ id: null, label: x.nazov }))
         } else {
-          const praxe = await ntiStore.fetchPraxeRaw()
-          ponuka.value = praxe.map(p => `${p.firma} — ${p.zadanie}`)
+          const p = await ntiStore.fetchPraxeRaw()
+          ponuka.value = p.map(x => ({ id: x.id, label: `${x.firma} — ${x.zadanie}` }))
         }
       } catch (e) { chyba.value = 'Nepodarilo sa načítať ponuku projektov.' }
     })
 
-    // pomocná funkcia na nahratie voliteľného súboru
     async function nahraj(subor) {
       const fd = new FormData()
       fd.append('subor', subor)
@@ -82,14 +78,16 @@ export default {
 
     async function odoslat() {
       chyba.value = ''
-      if (!vybranyProjekt.value) { chyba.value = 'Vyber projekt z ponuky.'; return }
+      if (!vybrany.value) { chyba.value = 'Vyber projekt z ponuky.'; return }
       odosielam.value = true
       try {
-        // voliteľné súbory uložíme do úložiska (dokumenty)
         if (motivList.value) await nahraj(motivList.value)
         if (cvSubor.value) await nahraj(cvSubor.value)
-        // podaj prihlášku
-        await ntiStore.podatPrihlasku({ program, nazov: vybranyProjekt.value })
+        await ntiStore.podatPrihlasku({
+          program,
+          nazov: vybrany.value.label,
+          prax_id: vybrany.value.id,
+        })
         router.push('/dashboard')
       } catch (e) {
         chyba.value = e.message
@@ -98,10 +96,11 @@ export default {
       }
     }
 
-    return { program, ponuka, vybranyProjekt, motivList, cvSubor, chyba, odosielam, odoslat }
+    return { program, ponuka, vybrany, motivList, cvSubor, chyba, odosielam, odoslat }
   }
 }
 </script>
+
 <style scoped>
 .pf-wrap { max-width: 620px; margin: 0 auto; padding: 2.5rem 1.5rem; }
 .pf-wrap h1 { font-size: 1.6rem; font-weight: 700; color: #1e293b; margin: 1rem 0 0.4rem; }
