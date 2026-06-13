@@ -1,14 +1,9 @@
 import { defineStore } from 'pinia'
-import { apiGet } from '../api.js'
+import { api } from '../api.js'
 
 export const useNtiStore = defineStore('nti', {
   state: () => ({
-    startups: [],
-    praxe: [],
-    partneri: [],
-    mentori: [],
-    novinky: [],
-    vyzvy: [],          // výzvy a termíny (§9)
+    startups: [], praxe: [], partneri: [], mentori: [], novinky: [], vyzvy: [],
     roles: [
       { key: 'student', name: 'Študent', desc: 'Jednotlivec uchádzajúci sa o prax alebo prácu v StartUpe' },
       { key: 'vedouci', name: 'Vedúci tímu', desc: 'Jednotlivec s právom správy tímu alebo zakladajúci StartUp' },
@@ -16,22 +11,41 @@ export const useNtiStore = defineStore('nti', {
       { key: 'mentor', name: 'Mentor', desc: 'Osoba sprevádzajúca projekt alebo tím' },
     ],
   }),
-
   getters: {
     getRoleByKey: (state) => (key) => state.roles.find(r => r.key === key),
   },
-
   actions: {
-    async fetchStartups() { this.startups = await apiGet('/startups') },
-    async fetchPraxe()    { this.praxe = await apiGet('/praxe') },
-    async fetchPartneri() { this.partneri = await apiGet('/partneri') },
-    async fetchMentori()  { this.mentori = await apiGet('/mentori') },
-    async fetchNovinky()  { this.novinky = await apiGet('/novinky') },
-    async fetchVyzvy()    { this.vyzvy = await apiGet('/vyzvy') },
-    
-    fetchStartup(id) { return apiGet(`/startups/${id}`) },
-    fetchPrax(id)    { return apiGet(`/praxe/${id}`) },
-    fetchNovinka(id) { return apiGet(`/novinky/${id}`) },
-    fetchVyzva(id) { return apiGet(`/vyzvy/${id}`) },
+    // verejné zoznamy
+    async fetchStartups() { this.startups = await api.get('/startups') },
+    async fetchPraxe()    { this.praxe = await api.get('/praxe') },
+    async fetchPartneri() { this.partneri = await api.get('/partneri') },
+    async fetchMentori()  { this.mentori = await api.get('/mentori') },
+    async fetchNovinky()  { this.novinky = await api.get('/novinky') },
+    async fetchVyzvy()    { this.vyzvy = await api.get('/vyzvy') },
+    fetchStartup(id) { return api.get(`/startups/${id}`) },
+    fetchPrax(id)    { return api.get(`/praxe/${id}`) },
+    fetchNovinka(id) { return api.get(`/novinky/${id}`) },
+    fetchVyzva(id)   { return api.get(`/vyzvy/${id}`) },
+
+    // FIRMA — zadania
+    fetchZadania()        { return api.get('/zadania') },
+    pridatZadanie(data)   { return api.post('/zadania', data) },
+    upravitZadanie(kod, d){ return api.put(`/zadania/${kod}`, d) },
+    zmazatZadanie(kod)    { return api.del(`/zadania/${kod}`) },
+
+    // VEDÚCI — tím
+    fetchMojTim()             { return api.get('/timy/moj') },
+    vytvoritTim(data)         { return api.post('/timy', data) },
+    pridatClena(kod, clen)    { return api.post(`/timy/${kod}/clenovia`, clen) },
+
+    // MENTOR — tímy a míľniky
+    fetchMentorTimy()         { return api.get('/timy/mentor') },
+    pripojitMentora(kod)      { return api.post(`/timy/${kod}/mentor`) },
+    pridatMilnik(kod, nazov)  { return api.post(`/timy/${kod}/milniky`, { nazov }) },
+    schvalitMilnik(kod, id)   { return api.patch(`/timy/${kod}/milniky/${id}`) },
+
+    // ŠTUDENT / VEDÚCI — prihlášky
+    fetchPrihlasky()          { return api.get('/prihlasky') },
+    podatPrihlasku(data)      { return api.post('/prihlasky', data) },
   },
 })

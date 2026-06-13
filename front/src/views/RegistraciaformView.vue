@@ -6,7 +6,11 @@
       <p class="form-subtitle">{{ role.desc }}</p>
 
       <div v-if="sent" class="form-success">
-        ✓ Registrácia bola odoslaná. Skontrolujte váš e-mail pre potvrdenie.
+          ✓ Registrácia odoslaná. Skontroluj e-mail pre overovací odkaz.
+          <!-- DEV: priamy odkaz (v produkcii by prišiel e-mailom) -->
+        <div style="margin-top:0.75rem;">
+          <RouterLink :to="`/overit/${verifyToken}`" class="btn-primary">Overiť e-mail (dev)</RouterLink>
+        </div>
       </div>
       <template v-else>
         <p class="form-section-title">Základné údaje</p>
@@ -135,7 +139,7 @@
 
 <script>
 import { ref, reactive, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useNtiStore } from '../stores/nti.js'
 import { useUserStore } from '../stores/user.js'
 import AppFooter from '../components/AppFooter.vue'
@@ -146,9 +150,9 @@ export default {
     const store = useNtiStore()
     const userStore = useUserStore()
     const route = useRoute()
-    const router = useRouter()
     const role = computed(() => store.getRoleByKey(route.params.role))
     const sent = ref(false)
+    const verifyToken = ref('')   // odkaz na overenie (dev)
     const chyba = ref('')
     const form = reactive({
       meno: '', priezvisko: '', email: '', heslo: '', heslo2: '',
@@ -163,7 +167,6 @@ export default {
       if (form.heslo !== form.heslo2) { chyba.value = 'Heslá sa nezhodujú.'; return }
       if (!form.gdpr) { chyba.value = 'Súhlas so spracovaním údajov je povinný.'; return }
 
-      // poskladaj payload pre backend podľa roly
       const payload = {
         meno: form.nazovOrg && role.value.key === 'firma' ? form.nazovOrg : form.meno,
         priezvisko: role.value.key === 'firma' ? '' : form.priezvisko,
@@ -177,15 +180,15 @@ export default {
       }
 
       try {
-        await userStore.register(payload)
-        sent.value = true
-        setTimeout(() => router.push('/dashboard'), 1200)
+        const res = await userStore.register(payload)
+        verifyToken.value = res.verify_token   // dev odkaz na overenie
+        sent.value = true                       // NEpresmerúvame na dashboard
       } catch (e) {
         chyba.value = e.message
       }
     }
 
-    return { role, form, sent, chyba, handleSubmit }
+    return { role, form, sent, verifyToken, chyba, handleSubmit }
   }
 }
 </script>

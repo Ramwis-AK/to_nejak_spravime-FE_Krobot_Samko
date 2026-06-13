@@ -58,7 +58,7 @@ export default {
     const store = useNtiStore()
     const userStore = useUserStore()
     const router = useRouter()
-    const mode = ref('registracia')
+    const mode = ref('registracia')   // prepínač registrácia / prihlásenie
     const email = ref('')
     const heslo = ref('')
     const chyba = ref('')
@@ -70,7 +70,7 @@ export default {
         await userStore.login(email.value, heslo.value)
         router.push('/dashboard')
       } catch (e) {
-        chyba.value = e.message
+        chyba.value = e.message   // napr. "Najprv si over e-mail." alebo zlé heslo
       }
     }
 
