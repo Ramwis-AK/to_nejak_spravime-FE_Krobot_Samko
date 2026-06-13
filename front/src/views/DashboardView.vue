@@ -1,4 +1,4 @@
-<!-- front/src/views/DashboardView.vue  (nahraď CELÝ súbor) -->
+<!-- front/src/views/DashboardView.vue  (template) -->
 <template>
   <div class="db-layout">
     <!-- ===== BOČNÉ MENU ===== -->
@@ -30,9 +30,7 @@
       <div class="db-content">
         <p v-if="chyba" class="db-error">{{ chyba }}</p>
 
-        <!-- =================================================== -->
-        <!-- PROFIL (všetky roly)                                -->
-        <!-- =================================================== -->
+        <!-- ===================== PROFIL (všetky roly) ===================== -->
         <div v-if="activeSection === 'profil'" class="db-panel">
           <h3>Môj profil</h3>
           <div class="db-form-group"><label>Meno</label><input class="db-input" v-model="profil.meno" type="text" /></div>
@@ -47,9 +45,7 @@
           <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
         </div>
 
-        <!-- =================================================== -->
-        <!-- ŠTUDENT — PRIHLÁŠKA                                 -->
-        <!-- =================================================== -->
+        <!-- ===================== ŠTUDENT — PRIHLÁŠKA ===================== -->
         <div v-else-if="activeSection === 'prihlaska'" class="db-panel">
           <h3>Moje prihlášky</h3>
           <div class="db-prog-cards" style="margin-bottom:1rem;">
@@ -71,9 +67,7 @@
           <div v-else class="db-empty">Zatiaľ žiadne prihlášky.</div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- ŠTUDENT / FIRMA — DOKUMENTY (úložisko)              -->
-        <!-- =================================================== -->
+        <!-- ===================== ŠTUDENT / FIRMA — DOKUMENTY ===================== -->
         <div v-else-if="activeSection === 'dokumenty'" class="db-panel">
           <h3>Moje dokumenty</h3>
           <div class="db-form-group">
@@ -92,11 +86,8 @@
           <div v-else class="db-empty">Žiadne nahrané dokumenty.</div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- ŠTUDENT — MÔJ TÍM (vytvor → si vedúci → pozvi ľudí) -->
-        <!-- =================================================== -->
+        <!-- ===================== ŠTUDENT — MÔJ TÍM ===================== -->
         <div v-else-if="activeSection === 'tim'">
-          <!-- Ak ešte nemá tím → formulár na vytvorenie -->
           <div v-if="!mojTim || !mojTim.kod" class="db-panel">
             <h3>Vytvoriť tím</h3>
             <p class="db-muted">Vytvorením tímu sa staneš jeho vedúcim.</p>
@@ -109,7 +100,6 @@
             <button class="db-btn" @click="vytvoritTim">Vytvoriť tím</button>
           </div>
 
-          <!-- Tím existuje → detail + pozývanie + rozpustenie -->
           <div v-else class="db-panel">
             <h3>Môj tím</h3>
             <div class="db-info-grid">
@@ -117,7 +107,6 @@
               <span class="db-info-label">Program</span><span>{{ mojTim.program }}</span>
               <span class="db-info-label">Mentor</span><span>{{ mojTim.mentor || '—' }}</span>
             </div>
-
             <div class="db-kod-box">
               <span class="db-kod-label">Kód tímu (zdieľaj s mentorom)</span>
               <div class="db-kod-row">
@@ -125,29 +114,24 @@
                 <button class="db-btn-sm-outline" @click="kopirovat(mojTim.kod)">{{ skopirovane ? '✓' : 'Kopírovať' }}</button>
               </div>
             </div>
-
             <div class="db-section-divider">Členovia</div>
             <div class="db-clenovia-list">
               <div v-for="(c, i) in mojTim.clenovia" :key="i" class="db-clen-item">
                 <span>{{ c.meno }}</span><span class="db-muted">{{ c.telefon }}</span>
               </div>
             </div>
-
             <div class="db-section-divider">Pridať člena</div>
             <div class="db-invite-row">
               <input class="db-input" v-model="novyClen.meno" placeholder="Meno" />
               <input class="db-input" v-model="novyClen.telefon" placeholder="Telefón" />
               <button class="db-btn" @click="pridatClena">Pridať</button>
             </div>
-
             <div class="db-section-divider">Zóna nebezpečenstva</div>
             <button class="db-btn-danger" @click="rozpustitTim">Rozpustiť tím</button>
           </div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- FIRMA — ZADANIA (CRUD)                              -->
-        <!-- =================================================== -->
+        <!-- ===================== FIRMA — ZADANIA (CRUD) ===================== -->
         <div v-else-if="activeSection === 'zadania'">
           <div class="db-panel" style="margin-bottom:1rem;">
             <h3>{{ editKod ? 'Upraviť zadanie' : 'Pridať zadanie' }}</h3>
@@ -182,9 +166,7 @@
           <div v-else class="db-empty">Žiadne zadania.</div>
         </div>
 
-        <!-- =================================================== -->
-        <!-- FIRMA — PO A ROZPOČET                               -->
-        <!-- =================================================== -->
+        <!-- ===================== FIRMA — PO A ROZPOČET ===================== -->
         <div v-else-if="activeSection === 'rozpocet'" class="db-panel">
           <h3>PO a rozpočet</h3>
           <div class="db-form-group"><label>Schválený rozpočet (€)</label><input class="db-input" v-model="rozpocet.schvaleny" type="number" min="0" /></div>
@@ -196,9 +178,8 @@
           <button class="db-btn" @click="ulozRozpocet">Uložiť</button>
           <p v-if="rozpocetUlozeny" class="db-success">Rozpočet uložený.</p>
         </div>
-        <!-- =================================================== -->
-        <!--       FIRMA — PRIHLÁŠKY NA ZADANIA                  -->
-        <!-- =================================================== -->
+
+        <!-- ===================== FIRMA — PRIHLÁŠKY NA ZADANIA ===================== -->
         <div v-else-if="activeSection === 'prihlasky_firma'">
           <div v-if="firemnePrihlasky.length">
             <div v-for="p in firemnePrihlasky" :key="p.id" class="db-zadanie-card">
@@ -220,15 +201,14 @@
               <div v-else class="db-empty">Žiadne dokumenty.</div>
               <div v-if="p.stav === 'Podaná'" style="display:flex;gap:0.5rem;margin-top:0.75rem;">
                 <button class="db-btn-sm-outline" @click="rozhodnut(p.id, 'Schválená')">Schváliť</button>
-                <button class="db-btn-danger" @click="rozhodnut(p.id, 'Zamietnuť' === 'Zamietnuť' ? 'Zamietnutá' : 'Zamietnutá')">Zamietnuť</button>
+                <button class="db-btn-danger" @click="rozhodnut(p.id, 'Zamietnutá')">Zamietnuť</button>
               </div>
             </div>
           </div>
           <div v-else class="db-empty">Žiadne prihlášky.</div>
         </div>
-        <!-- =================================================== -->
-        <!-- MENTOR — TÍMY, MÍĽNIKY, KONZULTÁCIE                 -->
-        <!-- =================================================== -->
+
+        <!-- ===================== MENTOR — TÍMY, MÍĽNIKY, KONZULTÁCIE ===================== -->
         <div v-else-if="activeSection === 'mentorTimy'">
           <div class="db-panel" style="margin-bottom:1rem;">
             <h3>Pripojiť sa k tímu</h3>
@@ -247,7 +227,6 @@
               <span class="db-info-label">Vedúci</span><span>{{ t.vedouci || '—' }}</span>
             </div>
 
-            <!-- Míľniky -->
             <div class="db-section-divider">Míľniky</div>
             <div v-if="t.milniky.length" class="db-milnik-list">
               <div v-for="m in t.milniky" :key="m.id" class="db-milnik-item">
@@ -262,7 +241,6 @@
               <button class="db-btn" @click="pridatMilnik(t.kod)">Pridať</button>
             </div>
 
-            <!-- Zápisy z konzultácií -->
             <div class="db-section-divider">Zápisy z konzultácií</div>
             <div v-if="t.konzultacie && t.konzultacie.length" class="db-clenovia-list">
               <div v-for="(k, ki) in t.konzultacie" :key="ki" class="db-clen-item">
@@ -280,11 +258,90 @@
           <div v-if="!mentorTimy.length" class="db-panel"><div class="db-empty">Nie si priradený k žiadnemu tímu.</div></div>
         </div>
 
+        <!-- ===================== ADMIN — VÝZVY (CRUD) ===================== -->
+        <div v-else-if="activeSection === 'admin_vyzvy'">
+          <div class="db-panel" style="margin-bottom:1rem;">
+            <h3>{{ editVyzvaId ? 'Upraviť výzvu' : 'Pridať výzvu' }}</h3>
+            <div class="db-form-group"><label>Názov</label><input class="db-input" v-model="vyzvaForm.nazov" /></div>
+            <div class="db-form-group"><label>Program</label>
+              <select class="db-input" v-model="vyzvaForm.program"><option>Program A</option><option>Program B</option></select>
+            </div>
+            <div class="db-form-group"><label>Popis</label><textarea class="db-input" v-model="vyzvaForm.popis" rows="2" /></div>
+            <div class="db-form-group"><label>Deadline</label><input class="db-input" type="date" v-model="vyzvaForm.deadline" /></div>
+            <div class="db-form-group"><label>Stav</label>
+              <select class="db-input" v-model="vyzvaForm.stav"><option>Otvorená</option><option>Uzavretá</option></select>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="db-btn" @click="ulozVyzvu">{{ editVyzvaId ? 'Uložiť' : 'Pridať' }}</button>
+              <button v-if="editVyzvaId" class="db-btn-outline" @click="editVyzvaId = null">Zrušiť</button>
+            </div>
+          </div>
+          <div v-for="v in vyzvy" :key="v.id" class="db-zadanie-card">
+            <div class="db-zadanie-header"><strong>{{ v.nazov }}</strong><span class="db-badge grey">{{ v.stav }}</span></div>
+            <p style="font-size:0.85rem;color:#64748b;">{{ v.program }} · deadline {{ v.deadline }}</p>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="db-btn-sm-outline" @click="upravitVyzvu(v)">Upraviť</button>
+              <button class="db-btn-danger" @click="zmazatVyzvu(v.id)">Zmazať</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== ADMIN — VŠETKY PRIHLÁŠKY ===================== -->
+        <div v-else-if="activeSection === 'admin_prihlasky'" class="db-panel">
+          <h3>Všetky prihlášky</h3>
+          <div v-if="vsetkyPrihlasky.length" class="db-clenovia-list">
+            <div v-for="p in vsetkyPrihlasky" :key="p.id" class="db-clen-item">
+              <span>{{ p.student }} → {{ p.nazov }} (Program {{ p.program }})</span>
+              <select class="db-input" style="max-width:170px;" :value="p.stav" @change="zmenStav(p.id, $event.target.value)">
+                <option>Podaná</option><option>Schválená</option><option>Zamietnutá</option><option>Onboarding</option><option>Ukončená</option>
+              </select>
+            </div>
+          </div>
+          <div v-else class="db-empty">Žiadne prihlášky.</div>
+        </div>
+
+        <!-- ===================== ADMIN — AUDIT LOG ===================== -->
+        <div v-else-if="activeSection === 'admin_audit'" class="db-panel">
+          <h3>Audit log</h3>
+          <div v-if="audit.length" class="db-clenovia-list">
+            <div v-for="(a, i) in audit" :key="i" class="db-clen-item">
+              <span>{{ a.akcia }} <span class="db-muted">— {{ a.objekt }}</span></span>
+              <span class="db-muted">{{ a.kto }} · {{ a.cas }}</span>
+            </div>
+          </div>
+          <div v-else class="db-empty">Žiadne záznamy.</div>
+        </div>
+
+        <!-- ===================== KOMISIA — HODNOTENIE PROGRAMU A ===================== -->
+        <div v-else-if="activeSection === 'komisia'">
+          <div v-if="komisiaPrihlasky.length">
+            <div v-for="p in komisiaPrihlasky" :key="p.id" class="db-zadanie-card">
+              <div class="db-zadanie-header">
+                <strong>{{ p.student }} → {{ p.nazov }}</strong>
+                <span :class="['db-badge', stavBadge(p.stav)]">{{ p.stav }}</span>
+              </div>
+              <div class="db-form-group"><label>Skóre (0–100)</label>
+                <input class="db-input" type="number" min="0" max="100"
+                  :value="p.skore"
+                  @input="(hodnotenie[p.id] = hodnotenie[p.id] || {}, hodnotenie[p.id].skore = $event.target.value)" />
+              </div>
+              <div class="db-form-group"><label>Komentár</label>
+                <textarea class="db-input" rows="2" :value="p.komentar"
+                  @input="(hodnotenie[p.id] = hodnotenie[p.id] || {}, hodnotenie[p.id].komentar = $event.target.value)" />
+              </div>
+              <div style="display:flex;gap:0.5rem;">
+                <button class="db-btn-sm-outline" @click="hodnotit(p.id, 'Schválená')">Schváliť</button>
+                <button class="db-btn-danger" @click="hodnotit(p.id, 'Zamietnutá')">Zamietnuť</button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="db-empty">Žiadne prihlášky Programu A.</div>
+        </div>
+
       </div>
     </main>
   </div>
 </template>
-
 <script>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -302,9 +359,14 @@ const MENU = [
   { key: 'rozpocet',        label: 'PO a rozpočet',  icon: '💰', roles: ['firma'] },
   { key: 'prihlasky_firma', label: 'Prihlášky',      icon: '📨', roles: ['firma'] },
   { key: 'mentorTimy',      label: 'Tímy a míľniky', icon: '🏁', roles: ['mentor'] },
+  { key: 'admin_vyzvy',     label: 'Výzvy',      icon: '📅', roles: ['admin'] },
+  { key: 'admin_prihlasky', label: 'Prihlášky',  icon: '📨', roles: ['admin'] },
+  { key: 'admin_audit',     label: 'Audit log',  icon: '🛡️', roles: ['admin'] },
+  { key: 'komisia',         label: 'Hodnotenie', icon: '⚖️', roles: ['komisia'] },
+
 ]
 
-const LABELS = { student: 'Študent', firma: 'Firma / partner', mentor: 'Mentor' }
+const LABELS = { student: 'Študent', firma: 'Firma / partner', mentor: 'Mentor', admin: 'NTI administrátor', komisia: 'Komisia' }
 
 export default {
   name: 'DashboardView',
@@ -502,6 +564,47 @@ export default {
       catch (e) { mentorChyba.value = e.message }
     }
 
+        // ADMIN — výzvy
+    const vyzvy = ref([])
+    const vyzvaForm = reactive({ nazov: '', program: 'Program A', popis: '', deadline: '', stav: 'Otvorená' })
+    const editVyzvaId = ref(null)
+    function resetVyzva() { Object.assign(vyzvaForm, { nazov: '', program: 'Program A', popis: '', deadline: '', stav: 'Otvorená' }) }
+    async function ulozVyzvu() {
+      chyba.value = ''
+      if (!vyzvaForm.nazov.trim() || !vyzvaForm.deadline) { chyba.value = 'Vyplň názov a deadline.'; return }
+      try {
+        if (editVyzvaId.value) await ntiStore.upravitVyzvu(editVyzvaId.value, { ...vyzvaForm })
+        else await ntiStore.pridatVyzvu({ ...vyzvaForm })
+        editVyzvaId.value = null; resetVyzva()
+        vyzvy.value = await ntiStore.fetchVyzvy() || vyzvy.value
+        vyzvy.value = ntiStore.vyzvy
+      } catch (e) { chyba.value = e.message }
+    }
+    function upravitVyzvu(v) { editVyzvaId.value = v.id; Object.assign(vyzvaForm, { nazov: v.nazov, program: v.program, popis: v.popis, deadline: v.deadline, stav: v.stav }) }
+    async function zmazatVyzvu(id) {
+      try { await ntiStore.zmazatVyzvu(id); await ntiStore.fetchVyzvy(); vyzvy.value = ntiStore.vyzvy }
+      catch (e) { chyba.value = e.message }
+    }
+
+    // ADMIN — prihlášky + audit
+    const vsetkyPrihlasky = ref([])
+    const audit = ref([])
+    async function zmenStav(id, stav) {
+      try { await ntiStore.zmenStavPrihlasky(id, stav); vsetkyPrihlasky.value = await ntiStore.fetchVsetkyPrihlasky() }
+      catch (e) { chyba.value = e.message }
+    }
+
+    // KOMISIA
+    const komisiaPrihlasky = ref([])
+    const hodnotenie = reactive({})   // { [id]: { skore, komentar } }
+    async function hodnotit(id, stav) {
+      const h = hodnotenie[id] || {}
+      try {
+        await ntiStore.hodnotitPrihlasku(id, { stav, skore: h.skore ?? null, komentar: h.komentar ?? null })
+        komisiaPrihlasky.value = await ntiStore.fetchKomisiaPrihlasky()
+      } catch (e) { chyba.value = e.message }
+    }
+
     // ====================================================
     // NAČÍTANIE DÁT PRI OTVORENÍ (podľa roly)
     // ====================================================
@@ -530,6 +633,14 @@ export default {
         if (role.value === 'mentor') {
           mentorTimy.value = await ntiStore.fetchMentorTimy()
         }
+        if (role.value === 'admin') {
+          await ntiStore.fetchVyzvy(); vyzvy.value = ntiStore.vyzvy
+          vsetkyPrihlasky.value = await ntiStore.fetchVsetkyPrihlasky()
+          audit.value = await ntiStore.fetchAudit()
+        }
+        if (role.value === 'komisia') {
+          komisiaPrihlasky.value = await ntiStore.fetchKomisiaPrihlasky()
+        }
       } catch (e) { chyba.value = e.message }
     })
 
@@ -548,6 +659,10 @@ export default {
       firemnePrihlasky, rozhodnut,
       // mentor
       mentorTimy, timKod, mentorChyba, mentorUspech, novyMilnik, novaKonzultacia, pripojit, pridatMilnik, schvalit, pridatKonzultaciu,
+      
+      vyzvy, vyzvaForm, editVyzvaId, ulozVyzvu, upravitVyzvu, zmazatVyzvu,
+      vsetkyPrihlasky, zmenStav, audit,
+      komisiaPrihlasky, hodnotenie, hodnotit,
     }
   }
 }
