@@ -1,11 +1,10 @@
 const BASE = 'http://127.0.0.1:8000/api'
 
-// token držíme v localStorage (prežije refresh stránky)
 export function getToken() { return localStorage.getItem('nti_token') }
 export function setToken(t) { localStorage.setItem('nti_token', t) }
 export function clearToken() { localStorage.removeItem('nti_token') }
 
-// zostaví hlavičky vrátane Bearer tokenu, ak je používateľ prihlásený
+// hlavičky pre JSON requesty
 function headers(json = true) {
   const h = { 'Accept': 'application/json' }
   if (json) h['Content-Type'] = 'application/json'
@@ -14,7 +13,6 @@ function headers(json = true) {
   return h
 }
 
-// spoločné spracovanie odpovede + jednotné chyby
 async function handle(res) {
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
@@ -33,8 +31,28 @@ export const api = {
   put:  (p, b) => fetch(`${BASE}${p}`, { method: 'PUT',    headers: headers(), body: JSON.stringify(b ?? {}) }).then(handle),
   patch:(p, b) => fetch(`${BASE}${p}`, { method: 'PATCH',  headers: headers(), body: JSON.stringify(b ?? {}) }).then(handle),
   del:  (p)    => fetch(`${BASE}${p}`, { method: 'DELETE', headers: headers(false) }).then(handle),
+
+  // upload súboru cez FormData — Content-Type NEsmie byť nastavený ručne
+  // (prehliadač ho doplní aj s "boundary")
+  upload: (p, formData) => fetch(`${BASE}${p}`, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}) },
+    body: formData,
+  }).then(handle),
 }
 
-// spätná kompatibilita s verejnými stránkami (HomeView, NovinkyView, KontaktView...)
+// stiahnutie chráneného súboru (potrebuje token v hlavičke)
+export async function downloadFile(path, filename) {
+  const res = await fetch(`${BASE}${path}`, { headers: headers(false) })
+  if (!res.ok) throw new Error('Stiahnutie zlyhalo')
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 export const apiGet = api.get
 export const apiPost = api.post

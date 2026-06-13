@@ -26,6 +26,9 @@ export const useNtiStore = defineStore('nti', {
     fetchPrax(id)    { return api.get(`/praxe/${id}`) },
     fetchNovinka(id) { return api.get(`/novinky/${id}`) },
     fetchVyzva(id)   { return api.get(`/vyzvy/${id}`) },
+    fetchDokumenty()         { return api.get('/dokumenty') },
+    nahratDokument(formData) { return api.upload('/dokumenty', formData) },
+    zmazatDokument(id)       { return api.del(`/dokumenty/${id}`) },
 
     // FIRMA — zadania
     fetchZadania()        { return api.get('/zadania') },

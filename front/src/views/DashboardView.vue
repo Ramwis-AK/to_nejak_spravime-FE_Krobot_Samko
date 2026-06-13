@@ -66,6 +66,25 @@
           <div v-else class="db-empty">Zatiaľ žiadne prihlášky.</div>
         </div>
 
+                <!-- ===== ŠTUDENT: DOKUMENTY ===== -->
+        <div v-else-if="activeSection === 'dokumenty'" class="db-panel">
+          <h3>Moje dokumenty</h3>
+          <div class="db-form-group">
+            <label>Nahrať dokument (PDF, DOC, DOCX — max 5 MB)</label>
+            <input type="file" accept=".pdf,.doc,.docx" @change="nahratDokument" />
+          </div>
+          <div v-if="dokumenty.length" class="db-clenovia-list">
+            <div v-for="d in dokumenty" :key="d.id" class="db-clen-item">
+              <span>📄 {{ d.nazov }}</span>
+              <span style="display:flex;gap:0.5rem;">
+                <button class="db-btn-sm-outline" @click="stiahnut(d)">Stiahnuť</button>
+                <button class="db-btn-danger" @click="zmazatDokument(d.id)">Zmazať</button>
+              </span>
+            </div>
+          </div>
+          <div v-else class="db-empty">Žiadne nahrané dokumenty.</div>
+        </div>
+
         <!-- ===== VEDÚCI: TÍM ===== -->
         <div v-else-if="activeSection === 'tim'">
           <div v-if="!mojTim" class="db-panel">
@@ -187,10 +206,12 @@ import { ref, computed, reactive, onMounted } from 'vue'
 import { useUserStore } from '../stores/user.js'
 import { useNtiStore } from '../stores/nti.js'
 import { useRouter } from 'vue-router'
+import { downloadFile } from '../api.js'
 
 const MENU = [
   { key: 'profil',     label: 'Môj profil', icon: '👤', roles: ['student','vedouci','firma','mentor'] },
   { key: 'prihlaska',  label: 'Prihláška',  icon: '📋', roles: ['student','vedouci'] },
+  { key: 'dokumenty',  label: 'Dokumenty',  icon: '📁', roles: ['student'] },   // ← pridaj
   { key: 'tim',        label: 'Môj tím',    icon: '👥', roles: ['vedouci'] },
   { key: 'zadania',    label: 'Zadania',    icon: '📝', roles: ['firma'] },
   { key: 'mentorTimy', label: 'Tímy a míľniky', icon: '🏁', roles: ['mentor'] },
@@ -226,6 +247,7 @@ export default {
       // ochrana stránky — neprihlásený ide na registráciu
       if (!userStore.isLoggedIn) { router.push('/registracia'); return }
       if (visibleMenu.value.length) activeSection.value = visibleMenu.value[0].key
+      if (role.value === 'student') dokumenty.value = await ntiStore.fetchDokumenty()
 
       // predvyplň profil z uložených údajov
       profil.meno = userStore.meno
@@ -253,6 +275,36 @@ export default {
 
     // --- prihláška ---
     function novaPrihlaska(program) { router.push({ path: '/dashboard/prihlaska-form', query: { program } }) }
+
+        // --- ŠTUDENT: DOKUMENTY ---
+    const dokumenty = ref([])
+
+    async function nahratDokument(e) {
+      const file = e.target.files[0]
+      if (!file) return
+      chyba.value = ''
+      try {
+        const fd = new FormData()
+        fd.append('subor', file)              // názov poľa musí byť "subor" (validácia v BE)
+        await ntiStore.nahratDokument(fd)
+        dokumenty.value = await ntiStore.fetchDokumenty()
+      } catch (err) {
+        chyba.value = err.message
+      }
+      e.target.value = ''                     // vyčisti input
+    }
+
+    async function stiahnut(d) {
+      try { await downloadFile(`/dokumenty/${d.id}/stiahnut`, d.nazov) }
+      catch (err) { chyba.value = err.message }
+    }
+
+    async function zmazatDokument(id) {
+      try {
+        await ntiStore.zmazatDokument(id)
+        dokumenty.value = await ntiStore.fetchDokumenty()
+      } catch (err) { chyba.value = err.message }
+    }
 
     // --- vedúci: tím ---
     const novyTim = reactive({ nazov: '', projekt: '', program: 'Program A' })
@@ -331,6 +383,7 @@ export default {
       mojTim, novyTim, novyClen, skopirovane, vytvoritTim, pridatClena, kopirovat,
       zadania, zadanieForm, editKod, ulozZadanie, upravit, zrusitEdit, zmazat,
       mentorTimy, timKod, mentorChyba, mentorUspech, novyMilnik, pripojit, pridatMilnik, schvalit,
+      dokumenty, nahratDokument, stiahnut, zmazatDokument,
     }
   }
 }
