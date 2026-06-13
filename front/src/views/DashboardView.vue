@@ -1,6 +1,7 @@
-<!-- front/src/views/DashboardView.vue  (nahraď celý súbor) -->
+<!-- front/src/views/DashboardView.vue  (nahraď CELÝ súbor) -->
 <template>
   <div class="db-layout">
+    <!-- ===== BOČNÉ MENU ===== -->
     <aside class="db-sidebar" :class="{ open: sidebarOpen }">
       <div class="db-sidebar-header">
         <span class="db-role-badge">{{ roleLabel }}</span>
@@ -29,7 +30,9 @@
       <div class="db-content">
         <p v-if="chyba" class="db-error">{{ chyba }}</p>
 
-        <!-- ===== PROFIL (všetky roly) ===== -->
+        <!-- =================================================== -->
+        <!-- PROFIL (všetky roly)                                -->
+        <!-- =================================================== -->
         <div v-if="activeSection === 'profil'" class="db-panel">
           <h3>Môj profil</h3>
           <div class="db-form-group"><label>Meno</label><input class="db-input" v-model="profil.meno" type="text" /></div>
@@ -38,13 +41,15 @@
           <template v-if="role === 'firma'">
             <div class="db-form-group"><label>IČO</label><input class="db-input" v-model="profil.ico" type="text" /></div>
             <div class="db-form-group"><label>Sektor</label><input class="db-input" v-model="profil.sektor" type="text" /></div>
-            <div class="db-form-group"><label>Web</label><input class="db-input" v-model="profil.web" type="url" /></div>
+            <div class="db-form-group"><label>Web</label><input class="db-input" v-model="profil.web" type="text" /></div>
           </template>
           <button class="db-btn" @click="ulozProfil">Uložiť zmeny</button>
           <p v-if="profilUlozene" class="db-success">Profil bol uložený.</p>
         </div>
 
-        <!-- ===== ŠTUDENT / VEDÚCI: PRIHLÁŠKA ===== -->
+        <!-- =================================================== -->
+        <!-- ŠTUDENT — PRIHLÁŠKA                                 -->
+        <!-- =================================================== -->
         <div v-else-if="activeSection === 'prihlaska'" class="db-panel">
           <h3>Moje prihlášky</h3>
           <div class="db-prog-cards" style="margin-bottom:1rem;">
@@ -66,7 +71,9 @@
           <div v-else class="db-empty">Zatiaľ žiadne prihlášky.</div>
         </div>
 
-                <!-- ===== ŠTUDENT: DOKUMENTY ===== -->
+        <!-- =================================================== -->
+        <!-- ŠTUDENT / FIRMA — DOKUMENTY (úložisko)              -->
+        <!-- =================================================== -->
         <div v-else-if="activeSection === 'dokumenty'" class="db-panel">
           <h3>Moje dokumenty</h3>
           <div class="db-form-group">
@@ -85,12 +92,15 @@
           <div v-else class="db-empty">Žiadne nahrané dokumenty.</div>
         </div>
 
-        <!-- ===== VEDÚCI: TÍM ===== -->
+        <!-- =================================================== -->
+        <!-- ŠTUDENT — MÔJ TÍM (vytvor → si vedúci → pozvi ľudí) -->
+        <!-- =================================================== -->
         <div v-else-if="activeSection === 'tim'">
-          <div v-if="!mojTim" class="db-panel">
+          <!-- Ak ešte nemá tím → formulár na vytvorenie -->
+          <div v-if="!mojTim || !mojTim.kod" class="db-panel">
             <h3>Vytvoriť tím</h3>
+            <p class="db-muted">Vytvorením tímu sa staneš jeho vedúcim.</p>
             <div class="db-form-group"><label>Názov tímu</label><input class="db-input" v-model="novyTim.nazov" type="text" /></div>
-            <div class="db-form-group"><label>Projekt</label><input class="db-input" v-model="novyTim.projekt" type="text" /></div>
             <div class="db-form-group"><label>Program</label>
               <select class="db-input" v-model="novyTim.program">
                 <option>Program A</option><option>Program B</option>
@@ -98,14 +108,16 @@
             </div>
             <button class="db-btn" @click="vytvoritTim">Vytvoriť tím</button>
           </div>
+
+          <!-- Tím existuje → detail + pozývanie + rozpustenie -->
           <div v-else class="db-panel">
             <h3>Môj tím</h3>
             <div class="db-info-grid">
               <span class="db-info-label">Názov</span><span>{{ mojTim.nazov }}</span>
-              <span class="db-info-label">Projekt</span><span>{{ mojTim.projekt }}</span>
               <span class="db-info-label">Program</span><span>{{ mojTim.program }}</span>
               <span class="db-info-label">Mentor</span><span>{{ mojTim.mentor || '—' }}</span>
             </div>
+
             <div class="db-kod-box">
               <span class="db-kod-label">Kód tímu (zdieľaj s mentorom)</span>
               <div class="db-kod-row">
@@ -113,49 +125,29 @@
                 <button class="db-btn-sm-outline" @click="kopirovat(mojTim.kod)">{{ skopirovane ? '✓' : 'Kopírovať' }}</button>
               </div>
             </div>
+
             <div class="db-section-divider">Členovia</div>
             <div class="db-clenovia-list">
               <div v-for="(c, i) in mojTim.clenovia" :key="i" class="db-clen-item">
                 <span>{{ c.meno }}</span><span class="db-muted">{{ c.telefon }}</span>
               </div>
             </div>
+
             <div class="db-section-divider">Pridať člena</div>
             <div class="db-invite-row">
               <input class="db-input" v-model="novyClen.meno" placeholder="Meno" />
               <input class="db-input" v-model="novyClen.telefon" placeholder="Telefón" />
               <button class="db-btn" @click="pridatClena">Pridať</button>
             </div>
-          </div>
-        </div>
-                <!-- ===== VEDÚCI: KOMUNIKÁCIA S NTI ===== -->
-        <div v-else-if="activeSection === 'komunikacia'" class="db-panel">
-          <h3>Komunikácia s NTI</h3>
-          <div class="db-chat">
-            <div v-for="(m, i) in spravy" :key="i" :class="['db-chat-msg', m.od === 'ja' ? 'moje' : 'nti']">
-              <p>{{ m.text }}</p>
-            </div>
-            <div v-if="!spravy.length" class="db-empty">Žiadne správy.</div>
-          </div>
-          <div class="db-invite-row">
-            <input class="db-input" v-model="novaSprava" placeholder="Napíš správu..." @keyup.enter="odoslatSpravu" />
-            <button class="db-btn" @click="odoslatSpravu">Odoslať</button>
+
+            <div class="db-section-divider">Zóna nebezpečenstva</div>
+            <button class="db-btn-danger" @click="rozpustitTim">Rozpustiť tím</button>
           </div>
         </div>
 
-        <!-- ===== FIRMA: PO A ROZPOČET ===== -->
-        <div v-else-if="activeSection === 'rozpocet'" class="db-panel">
-          <h3>PO a rozpočet</h3>
-          <div class="db-form-group"><label>Schválený rozpočet (€)</label><input class="db-input" v-model="rozpocet.schvaleny" type="number" min="0" /></div>
-          <div class="db-form-group"><label>Čerpané (€)</label><input class="db-input" v-model="rozpocet.cerpane" type="number" min="0" /></div>
-          <div class="db-info-grid">
-            <span class="db-info-label">Zostatok</span>
-            <strong>€ {{ (Number(rozpocet.schvaleny || 0) - Number(rozpocet.cerpane || 0)).toLocaleString('sk-SK') }}</strong>
-          </div>
-          <button class="db-btn" @click="ulozRozpocet">Uložiť</button>
-          <p v-if="rozpocetUlozeny" class="db-success">Rozpočet uložený.</p>
-        </div>
-
-        <!-- ===== FIRMA: ZADANIA (CRUD) ===== -->
+        <!-- =================================================== -->
+        <!-- FIRMA — ZADANIA (CRUD)                              -->
+        <!-- =================================================== -->
         <div v-else-if="activeSection === 'zadania'">
           <div class="db-panel" style="margin-bottom:1rem;">
             <h3>{{ editKod ? 'Upraviť zadanie' : 'Pridať zadanie' }}</h3>
@@ -190,7 +182,24 @@
           <div v-else class="db-empty">Žiadne zadania.</div>
         </div>
 
-        <!-- ===== MENTOR: TÍMY A MÍĽNIKY ===== -->
+        <!-- =================================================== -->
+        <!-- FIRMA — PO A ROZPOČET                               -->
+        <!-- =================================================== -->
+        <div v-else-if="activeSection === 'rozpocet'" class="db-panel">
+          <h3>PO a rozpočet</h3>
+          <div class="db-form-group"><label>Schválený rozpočet (€)</label><input class="db-input" v-model="rozpocet.schvaleny" type="number" min="0" /></div>
+          <div class="db-form-group"><label>Čerpané (€)</label><input class="db-input" v-model="rozpocet.cerpane" type="number" min="0" /></div>
+          <div class="db-info-grid">
+            <span class="db-info-label">Zostatok</span>
+            <strong>€ {{ (Number(rozpocet.schvaleny || 0) - Number(rozpocet.cerpane || 0)).toLocaleString('sk-SK') }}</strong>
+          </div>
+          <button class="db-btn" @click="ulozRozpocet">Uložiť</button>
+          <p v-if="rozpocetUlozeny" class="db-success">Rozpočet uložený.</p>
+        </div>
+
+        <!-- =================================================== -->
+        <!-- MENTOR — TÍMY, MÍĽNIKY, KONZULTÁCIE                 -->
+        <!-- =================================================== -->
         <div v-else-if="activeSection === 'mentorTimy'">
           <div class="db-panel" style="margin-bottom:1rem;">
             <h3>Pripojiť sa k tímu</h3>
@@ -201,13 +210,15 @@
             <p v-if="mentorChyba" class="db-error">{{ mentorChyba }}</p>
             <p v-if="mentorUspech" class="db-success">{{ mentorUspech }}</p>
           </div>
+
           <div v-for="t in mentorTimy" :key="t.kod" class="db-panel" style="margin-bottom:1rem;">
             <div class="db-zadanie-header"><strong>{{ t.nazov }}</strong><span class="db-kod-inline">{{ t.kod }}</span></div>
             <div class="db-info-grid" style="margin-top:0.5rem;">
-              <span class="db-info-label">Projekt</span><span>{{ t.projekt }}</span>
               <span class="db-info-label">Program</span><span>{{ t.program }}</span>
+              <span class="db-info-label">Vedúci</span><span>{{ t.vedouci || '—' }}</span>
             </div>
 
+            <!-- Míľniky -->
             <div class="db-section-divider">Míľniky</div>
             <div v-if="t.milniky.length" class="db-milnik-list">
               <div v-for="m in t.milniky" :key="m.id" class="db-milnik-item">
@@ -236,31 +247,34 @@
               <button class="db-btn" @click="pridatKonzultaciu(t.kod)">Pridať zápis</button>
             </div>
           </div>
+
           <div v-if="!mentorTimy.length" class="db-panel"><div class="db-empty">Nie si priradený k žiadnemu tímu.</div></div>
         </div>
+
       </div>
     </main>
   </div>
 </template>
 
 <script>
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user.js'
 import { useNtiStore } from '../stores/nti.js'
-import { useRouter } from 'vue-router'
 import { downloadFile } from '../api.js'
 
+// Položky menu — každá má zoznam rolí, ktoré ju vidia
 const MENU = [
-  { key: 'profil',      label: 'Môj profil',        icon: '👤', roles: ['student','vedouci','firma','mentor'] },
-  { key: 'prihlaska',   label: 'Prihláška',          icon: '📋', roles: ['student','vedouci'] },
-  { key: 'dokumenty',   label: 'Dokumenty',          icon: '📁', roles: ['student','firma'] },   // firma = tech. špecifikácia
-  { key: 'tim',         label: 'Môj tím',            icon: '👥', roles: ['vedouci'] },
-  { key: 'komunikacia', label: 'Komunikácia s NTI',  icon: '💬', roles: ['vedouci'] },
-  { key: 'zadania',     label: 'Zadania',            icon: '📝', roles: ['firma'] },
-  { key: 'rozpocet',    label: 'PO a rozpočet',      icon: '💰', roles: ['firma'] },
-  { key: 'mentorTimy',  label: 'Tímy a míľniky',     icon: '🏁', roles: ['mentor'] },
+  { key: 'profil',     label: 'Môj profil',     icon: '👤', roles: ['student', 'firma', 'mentor'] },
+  { key: 'prihlaska',  label: 'Prihláška',      icon: '📋', roles: ['student'] },
+  { key: 'dokumenty',  label: 'Dokumenty',      icon: '📁', roles: ['student', 'firma'] },
+  { key: 'tim',        label: 'Môj tím',        icon: '👥', roles: ['student'] },
+  { key: 'zadania',    label: 'Zadania',        icon: '📝', roles: ['firma'] },
+  { key: 'rozpocet',   label: 'PO a rozpočet',  icon: '💰', roles: ['firma'] },
+  { key: 'mentorTimy', label: 'Tímy a míľniky', icon: '🏁', roles: ['mentor'] },
 ]
-const LABELS = { student: 'Študent', vedouci: 'Vedúci tímu', firma: 'Firma / partner', mentor: 'Mentor' }
+
+const LABELS = { student: 'Študent', firma: 'Firma / partner', mentor: 'Mentor' }
 
 export default {
   name: 'DashboardView',
@@ -268,64 +282,25 @@ export default {
     const userStore = useUserStore()
     const ntiStore = useNtiStore()
     const router = useRouter()
+
+    // --- Stav rozhrania ---
     const sidebarOpen = ref(false)
     const chyba = ref('')
+    const activeSection = ref(null)
 
     const role = computed(() => userStore.role)
     const roleLabel = computed(() => LABELS[role.value] || role.value)
     const visibleMenu = computed(() => MENU.filter(i => i.roles.includes(role.value)))
-    const activeSection = ref(null)
     const currentSection = computed(() => MENU.find(i => i.key === activeSection.value))
 
-    // --- profil ---
-    const profil = reactive({ meno: '', telefon: '', adresa: '', ico: '', sektor: '', web: '' })
-    const profilUlozene = ref(false)
-
-    // --- dáta podľa roly ---
-    const prihlasky = ref([])
-    const mojTim = ref(null)
-    const mentorTimy = ref([])
-    const zadania = ref([])
-
-    onMounted(async () => {
-      // ochrana stránky — neprihlásený ide na registráciu
-      if (!userStore.isLoggedIn) { router.push('/registracia'); return }
-      if (visibleMenu.value.length) activeSection.value = visibleMenu.value[0].key
-
-      // predvyplň profil z uložených údajov
-      profil.meno = userStore.meno
-      Object.assign(profil, userStore.profil)
-
-      try {
-        // ŠTUDENT
-        if (role.value === 'student') {
-          prihlasky.value = await ntiStore.fetchPrihlasky()
-          dokumenty.value = await ntiStore.fetchDokumenty()
-        }
-        // VEDÚCI
-        if (role.value === 'vedouci') {
-          prihlasky.value = await ntiStore.fetchPrihlasky()
-          mojTim.value = await ntiStore.fetchMojTim()
-          spravy.value = await ntiStore.fetchSpravy()
-        }
-        // FIRMA
-        if (role.value === 'firma') {
-          zadania.value = await ntiStore.fetchZadania()
-          dokumenty.value = await ntiStore.fetchDokumenty()
-          const r = await ntiStore.fetchRozpocet()
-          rozpocet.schvaleny = r.schvaleny || 0
-          rozpocet.cerpane = r.cerpane || 0
-        }
-        // MENTOR
-        if (role.value === 'mentor') {
-          mentorTimy.value = await ntiStore.fetchMentorTimy()
-        }
-      } catch (e) { chyba.value = e.message }
-    })
-
-    function navigate(k) { activeSection.value = k; sidebarOpen.value = false }
+    function navigate(key) { activeSection.value = key; sidebarOpen.value = false }
     async function logout() { await userStore.logout(); router.push('/registracia') }
 
+    // ====================================================
+    // PROFIL (všetky roly)
+    // ====================================================
+    const profil = reactive({ meno: '', telefon: '', adresa: '', ico: '', sektor: '', web: '' })
+    const profilUlozene = ref(false)
     async function ulozProfil() {
       chyba.value = ''
       try {
@@ -335,41 +310,44 @@ export default {
       } catch (e) { chyba.value = e.message }
     }
 
-    // --- prihláška ---
-    function novaPrihlaska(program) { router.push({ path: '/dashboard/prihlaska-form', query: { program } }) }
+    // ====================================================
+    // ŠTUDENT — PRIHLÁŠKY
+    // ====================================================
+    const prihlasky = ref([])
+    function novaPrihlaska(program) {
+      router.push({ path: '/dashboard/prihlaska-form', query: { program } })
+    }
 
-        // --- ŠTUDENT: DOKUMENTY ---
+    // ====================================================
+    // ŠTUDENT / FIRMA — DOKUMENTY (spoločné)
+    // ====================================================
     const dokumenty = ref([])
-
     async function nahratDokument(e) {
       const file = e.target.files[0]
       if (!file) return
       chyba.value = ''
       try {
         const fd = new FormData()
-        fd.append('subor', file)              // názov poľa musí byť "subor" (validácia v BE)
+        fd.append('subor', file)
         await ntiStore.nahratDokument(fd)
         dokumenty.value = await ntiStore.fetchDokumenty()
-      } catch (err) {
-        chyba.value = err.message
-      }
-      e.target.value = ''                     // vyčisti input
+      } catch (err) { chyba.value = err.message }
+      e.target.value = ''
     }
-
     async function stiahnut(d) {
       try { await downloadFile(`/dokumenty/${d.id}/stiahnut`, d.nazov) }
       catch (err) { chyba.value = err.message }
     }
-
     async function zmazatDokument(id) {
-      try {
-        await ntiStore.zmazatDokument(id)
-        dokumenty.value = await ntiStore.fetchDokumenty()
-      } catch (err) { chyba.value = err.message }
+      try { await ntiStore.zmazatDokument(id); dokumenty.value = await ntiStore.fetchDokumenty() }
+      catch (err) { chyba.value = err.message }
     }
 
-    // --- vedúci: tím ---
-    const novyTim = reactive({ nazov: '', projekt: '', program: 'Program A' })
+    // ====================================================
+    // ŠTUDENT — MÔJ TÍM
+    // ====================================================
+    const mojTim = ref(null)
+    const novyTim = reactive({ nazov: '', program: 'Program A' })
     const novyClen = reactive({ meno: '', telefon: '' })
     const skopirovane = ref(false)
 
@@ -386,49 +364,22 @@ export default {
       } catch (e) { chyba.value = e.message }
     }
     function kopirovat(kod) {
-      navigator.clipboard.writeText(kod).then(() => { skopirovane.value = true; setTimeout(() => skopirovane.value = false, 1500) })
+      navigator.clipboard.writeText(kod).then(() => {
+        skopirovane.value = true
+        setTimeout(() => skopirovane.value = false, 1500)
+      })
     }
-
-    // --- VEDÚCI: KOMUNIKÁCIA ---
-    const spravy = ref([])
-    const novaSprava = ref('')
-    async function odoslatSpravu() {
-      if (!novaSprava.value.trim()) return
-      try {
-        await ntiStore.odoslatSpravu(novaSprava.value)
-        novaSprava.value = ''
-        spravy.value = await ntiStore.fetchSpravy()
-      } catch (e) { chyba.value = e.message }
-    }
-
-    // --- FIRMA: ROZPOČET ---
-    const rozpocet = reactive({ schvaleny: 0, cerpane: 0 })
-    const rozpocetUlozeny = ref(false)
-    async function ulozRozpocet() {
+    async function rozpustitTim() {
+      if (!confirm('Naozaj rozpustiť tím? Zmaže sa tím, členovia aj míľniky.')) return
       chyba.value = ''
-      try {
-        const r = await ntiStore.ulozRozpocet({ schvaleny: Number(rozpocet.schvaleny || 0), cerpane: Number(rozpocet.cerpane || 0) })
-        rozpocet.schvaleny = r.schvaleny; rozpocet.cerpane = r.cerpane
-        rozpocetUlozeny.value = true
-        setTimeout(() => rozpocetUlozeny.value = false, 2500)
-      } catch (e) { chyba.value = e.message }
+      try { await ntiStore.rozpustitTim(mojTim.value.kod); mojTim.value = null }
+      catch (e) { chyba.value = e.message }
     }
 
-    // --- FIRMA: DOKUMENTY (využíva tie isté funkcie ako študent) ---
-    // nahratDokument / stiahnut / zmazatDokument už máš z predošlého kroku
-
-    // --- MENTOR: KONZULTÁCIE ---
-    const novaKonzultacia = reactive({})
-    async function pridatKonzultaciu(kod) {
-      if (!novaKonzultacia[kod]?.trim()) return
-      try {
-        await ntiStore.pridatKonzultaciu(kod, novaKonzultacia[kod])
-        novaKonzultacia[kod] = ''
-        mentorTimy.value = await ntiStore.fetchMentorTimy()
-      } catch (e) { chyba.value = e.message }
-    }
-
-    // --- firma: zadania ---
+    // ====================================================
+    // FIRMA — ZADANIA (CRUD)
+    // ====================================================
+    const zadania = ref([])
     const zadanieForm = reactive({ nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' })
     const editKod = ref(null)
     function resetForm() { Object.assign(zadanieForm, { nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' }) }
@@ -450,11 +401,30 @@ export default {
       catch (e) { chyba.value = e.message }
     }
 
-    // --- mentor: tímy ---
+    // ====================================================
+    // FIRMA — ROZPOČET
+    // ====================================================
+    const rozpocet = reactive({ schvaleny: 0, cerpane: 0 })
+    const rozpocetUlozeny = ref(false)
+    async function ulozRozpocet() {
+      chyba.value = ''
+      try {
+        const r = await ntiStore.ulozRozpocet({ schvaleny: Number(rozpocet.schvaleny || 0), cerpane: Number(rozpocet.cerpane || 0) })
+        rozpocet.schvaleny = r.schvaleny; rozpocet.cerpane = r.cerpane
+        rozpocetUlozeny.value = true
+        setTimeout(() => rozpocetUlozeny.value = false, 2500)
+      } catch (e) { chyba.value = e.message }
+    }
+
+    // ====================================================
+    // MENTOR — TÍMY, MÍĽNIKY, KONZULTÁCIE
+    // ====================================================
+    const mentorTimy = ref([])
     const timKod = ref('')
     const mentorChyba = ref('')
     const mentorUspech = ref('')
     const novyMilnik = reactive({})
+    const novaKonzultacia = reactive({})
 
     async function pripojit() {
       mentorChyba.value = ''; mentorUspech.value = ''
@@ -475,16 +445,56 @@ export default {
       try { await ntiStore.schvalitMilnik(kod, id); mentorTimy.value = await ntiStore.fetchMentorTimy() }
       catch (e) { mentorChyba.value = e.message }
     }
+    async function pridatKonzultaciu(kod) {
+      if (!novaKonzultacia[kod]?.trim()) return
+      try { await ntiStore.pridatKonzultaciu(kod, novaKonzultacia[kod]); novaKonzultacia[kod] = ''; mentorTimy.value = await ntiStore.fetchMentorTimy() }
+      catch (e) { mentorChyba.value = e.message }
+    }
+
+    // ====================================================
+    // NAČÍTANIE DÁT PRI OTVORENÍ (podľa roly)
+    // ====================================================
+    onMounted(async () => {
+      if (!userStore.isLoggedIn) { router.push('/registracia'); return }
+      if (visibleMenu.value.length) activeSection.value = visibleMenu.value[0].key
+
+      // predvyplň profil
+      profil.meno = userStore.meno
+      Object.assign(profil, userStore.profil)
+
+      try {
+        if (role.value === 'student') {
+          prihlasky.value = await ntiStore.fetchPrihlasky()
+          dokumenty.value = await ntiStore.fetchDokumenty()
+          mojTim.value = await ntiStore.fetchMojTim()   // null ak ešte nemá tím
+        }
+        if (role.value === 'firma') {
+          zadania.value = await ntiStore.fetchZadania()
+          dokumenty.value = await ntiStore.fetchDokumenty()
+          const r = await ntiStore.fetchRozpocet()
+          rozpocet.schvaleny = r.schvaleny || 0
+          rozpocet.cerpane = r.cerpane || 0
+        }
+        if (role.value === 'mentor') {
+          mentorTimy.value = await ntiStore.fetchMentorTimy()
+        }
+      } catch (e) { chyba.value = e.message }
+    })
 
     return {
-      userStore, role, roleLabel, visibleMenu, activeSection, currentSection, sidebarOpen, chyba,
-      navigate, logout,
+      // jadro
+      userStore, role, roleLabel, visibleMenu, activeSection, currentSection, sidebarOpen, chyba, navigate, logout,
+      // profil
       profil, profilUlozene, ulozProfil,
+      // študent
       prihlasky, novaPrihlaska,
-      mojTim, novyTim, novyClen, skopirovane, vytvoritTim, pridatClena, kopirovat,
-      zadania, zadanieForm, editKod, ulozZadanie, upravit, zrusitEdit, zmazat,
-      mentorTimy, timKod, mentorChyba, mentorUspech, novyMilnik, pripojit, pridatMilnik, schvalit,
       dokumenty, nahratDokument, stiahnut, zmazatDokument,
+      mojTim, novyTim, novyClen, skopirovane, vytvoritTim, pridatClena, kopirovat, rozpustitTim,
+      // firma
+      zadania, zadanieForm, editKod, ulozZadanie, upravit, zrusitEdit, zmazat,
+      rozpocet, rozpocetUlozeny, ulozRozpocet,
+      // mentor
+      mentorTimy, timKod, mentorChyba, mentorUspech, novyMilnik, novaKonzultacia, pripojit, pridatMilnik, schvalit, pridatKonzultaciu,
     }
   }
 }
@@ -527,9 +537,9 @@ export default {
 .db-btn-sm { display: inline-block; margin-top: 0.5rem; padding: 0.4rem 0.9rem; background: #c8972a; color: #fff; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
 .db-btn-sm-outline { align-self: flex-start; padding: 0.35rem 0.8rem; background: none; border: 1px solid #c8972a; color: #c8972a; border-radius: 6px; font-size: 0.82rem; cursor: pointer; font-family: inherit; }
 .db-btn-outline { padding: 0.5rem 1rem; background: none; border: 1px solid #e2e8f0; color: #64748b; border-radius: 8px; font-size: 0.88rem; cursor: pointer; font-family: inherit; }
-.db-btn-danger { padding: 0.35rem 0.8rem; background: none; border: 1px solid #fca5a5; color: #dc2626; border-radius: 6px; font-size: 0.82rem; cursor: pointer; font-family: inherit; }
+.db-btn-danger { align-self: flex-start; padding: 0.35rem 0.8rem; background: none; border: 1px solid #fca5a5; color: #dc2626; border-radius: 6px; font-size: 0.82rem; cursor: pointer; font-family: inherit; }
 .db-empty { font-size: 0.9rem; color: #94a3b8; padding: 1rem; background: #f8fafc; border-radius: 8px; text-align: center; border: 1px dashed #e2e8f0; }
-.db-muted { font-size: 0.9rem; color: #94a3b8; }
+.db-muted { font-size: 0.9rem; color: #94a3b8; margin: 0; }
 .db-success { font-size: 0.88rem; color: #16a34a; margin: 0; }
 .db-error { font-size: 0.88rem; color: #dc2626; margin: 0 0 1rem; }
 .db-prog-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }

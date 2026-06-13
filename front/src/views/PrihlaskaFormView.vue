@@ -3,50 +3,37 @@
     <div class="pf-wrap">
       <RouterLink to="/dashboard" class="back-btn">← Späť na dashboard</RouterLink>
       <h1>Prihláška — Program {{ program }}</h1>
-      <p class="pf-sub">Vyplň údaje a odošli prihlášku. Po odoslaní čakáš na schválenie NTI.</p>
+      <p class="pf-sub">Vyber projekt z ponuky. Motivačný list a CV sú voliteľné.</p>
 
       <div class="pf-form">
-
-        <div class="pf-section">Základné údaje</div>
+        <!-- Výber projektu z ponuky -->
         <div class="pf-group">
-          <label>Názov projektu / startupu</label>
-          <input class="pf-input" v-model="form.nazov" type="text" placeholder="Názov" />
-        </div>
-        <div class="pf-group">
-          <label>Popis projektu</label>
-          <textarea class="pf-input" v-model="form.popis" rows="4" placeholder="Stručný popis nápadu alebo zadania..." />
-        </div>
-        <div class="pf-group">
-          <label>Oblasť / sektor</label>
-          <input class="pf-input" v-model="form.oblast" type="text" placeholder="IT, AgriTech, HealthTech..." />
+          <label>Projekt *</label>
+          <select class="pf-input" v-model="vybranyProjekt">
+            <option value="">— Vyber projekt —</option>
+            <option v-for="p in ponuka" :key="p" :value="p">{{ p }}</option>
+          </select>
         </div>
 
-        <!-- Rozšírenie pre vedúceho tímu -->
-        <template v-if="role === 'vedouci'">
-          <div class="pf-section">Údaje tímu</div>
-          <div class="pf-group">
-            <label>Názov tímu</label>
-            <input class="pf-input" v-model="form.nazovTimu" type="text" />
-          </div>
-          <div v-for="(clen, i) in form.clenovia" :key="i" class="pf-clen-row">
-            <span class="pf-clen-label">Člen {{ i + 1 }}</span>
-            <input class="pf-input" v-model="clen.meno" type="text" placeholder="Meno a priezvisko" />
-            <input class="pf-input" v-model="clen.email" type="email" placeholder="email@student.sk" />
-            <button class="pf-btn-remove" @click="form.clenovia.splice(i,1)">✕</button>
-          </div>
-          <button class="pf-btn-outline" @click="form.clenovia.push({ meno: '', email: '' })">+ Pridať člena</button>
-        </template>
+        <!-- Voliteľný motivačný list (súbor) -->
+        <div class="pf-group">
+          <label>Motivačný list (voliteľné, PDF/DOC)</label>
+          <input type="file" accept=".pdf,.doc,.docx" @change="e => motivList = e.target.files[0]" />
+        </div>
 
-        <div class="pf-group" style="margin-top:1rem;">
-          <label>Motivačný list (voliteľné)</label>
-          <textarea class="pf-input" v-model="form.motivacia" rows="3" placeholder="Prečo chceš vstúpiť do programu..." />
+        <!-- Voliteľné CV / iný dokument -->
+        <div class="pf-group">
+          <label>CV alebo iný dokument (voliteľné, PDF/DOC)</label>
+          <input type="file" accept=".pdf,.doc,.docx" @change="e => cvSubor = e.target.files[0]" />
         </div>
 
         <p v-if="chyba" class="pf-error">{{ chyba }}</p>
 
         <div class="pf-actions">
           <RouterLink to="/dashboard" class="pf-btn-cancel">Zrušiť</RouterLink>
-          <button class="pf-btn-submit" @click="odoslat">Potvrdiť a odoslať</button>
+          <button class="pf-btn-submit" @click="odoslat" :disabled="odosielam">
+            {{ odosielam ? 'Odosielam...' : 'Potvrdiť a odoslať' }}
+          </button>
         </div>
       </div>
     </div>
@@ -54,9 +41,8 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '../stores/user.js'
 import { useNtiStore } from '../stores/nti.js'
 
 export default {
@@ -64,32 +50,55 @@ export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
-    const userStore = useUserStore()
     const ntiStore = useNtiStore()
     const program = route.query.program || 'A'
-    const role = userStore.role
-    const chyba = ref('')
 
-    const form = ref({ nazov: '', popis: '', oblast: '', motivacia: '', nazovTimu: '', clenovia: [] })
+    const ponuka = ref([])          // zoznam ponúkaných projektov
+    const vybranyProjekt = ref('')
+    const motivList = ref(null)     // voliteľný súbor
+    const cvSubor = ref(null)       // voliteľný súbor
+    const chyba = ref('')
+    const odosielam = ref(false)
+
+    // Načítaj ponuku projektov podľa programu (A = startupy, B = prax)
+    onMounted(async () => {
+      try {
+        if (program === 'A') {
+          const startupy = await ntiStore.fetchStartupyRaw()
+          ponuka.value = startupy.map(s => s.nazov)
+        } else {
+          const praxe = await ntiStore.fetchPraxeRaw()
+          ponuka.value = praxe.map(p => `${p.firma} — ${p.zadanie}`)
+        }
+      } catch (e) { chyba.value = 'Nepodarilo sa načítať ponuku projektov.' }
+    })
+
+    // pomocná funkcia na nahratie voliteľného súboru
+    async function nahraj(subor) {
+      const fd = new FormData()
+      fd.append('subor', subor)
+      await ntiStore.nahratDokument(fd)
+    }
 
     async function odoslat() {
       chyba.value = ''
-      if (!form.value.nazov.trim()) { chyba.value = 'Vyplň názov projektu.'; return }
+      if (!vybranyProjekt.value) { chyba.value = 'Vyber projekt z ponuky.'; return }
+      odosielam.value = true
       try {
-        await ntiStore.podatPrihlasku({
-          program,
-          nazov: form.value.nazov,
-          popis: form.value.popis,
-          oblast: form.value.oblast,
-          motivacia: form.value.motivacia,
-        })
+        // voliteľné súbory uložíme do úložiska (dokumenty)
+        if (motivList.value) await nahraj(motivList.value)
+        if (cvSubor.value) await nahraj(cvSubor.value)
+        // podaj prihlášku
+        await ntiStore.podatPrihlasku({ program, nazov: vybranyProjekt.value })
         router.push('/dashboard')
       } catch (e) {
         chyba.value = e.message
+      } finally {
+        odosielam.value = false
       }
     }
 
-    return { program, role, form, chyba, odoslat }
+    return { program, ponuka, vybranyProjekt, motivList, cvSubor, chyba, odosielam, odoslat }
   }
 }
 </script>
