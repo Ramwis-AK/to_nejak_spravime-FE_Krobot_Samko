@@ -127,6 +127,33 @@
             </div>
           </div>
         </div>
+                <!-- ===== VEDÚCI: KOMUNIKÁCIA S NTI ===== -->
+        <div v-else-if="activeSection === 'komunikacia'" class="db-panel">
+          <h3>Komunikácia s NTI</h3>
+          <div class="db-chat">
+            <div v-for="(m, i) in spravy" :key="i" :class="['db-chat-msg', m.od === 'ja' ? 'moje' : 'nti']">
+              <p>{{ m.text }}</p>
+            </div>
+            <div v-if="!spravy.length" class="db-empty">Žiadne správy.</div>
+          </div>
+          <div class="db-invite-row">
+            <input class="db-input" v-model="novaSprava" placeholder="Napíš správu..." @keyup.enter="odoslatSpravu" />
+            <button class="db-btn" @click="odoslatSpravu">Odoslať</button>
+          </div>
+        </div>
+
+        <!-- ===== FIRMA: PO A ROZPOČET ===== -->
+        <div v-else-if="activeSection === 'rozpocet'" class="db-panel">
+          <h3>PO a rozpočet</h3>
+          <div class="db-form-group"><label>Schválený rozpočet (€)</label><input class="db-input" v-model="rozpocet.schvaleny" type="number" min="0" /></div>
+          <div class="db-form-group"><label>Čerpané (€)</label><input class="db-input" v-model="rozpocet.cerpane" type="number" min="0" /></div>
+          <div class="db-info-grid">
+            <span class="db-info-label">Zostatok</span>
+            <strong>€ {{ (Number(rozpocet.schvaleny || 0) - Number(rozpocet.cerpane || 0)).toLocaleString('sk-SK') }}</strong>
+          </div>
+          <button class="db-btn" @click="ulozRozpocet">Uložiť</button>
+          <p v-if="rozpocetUlozeny" class="db-success">Rozpočet uložený.</p>
+        </div>
 
         <!-- ===== FIRMA: ZADANIA (CRUD) ===== -->
         <div v-else-if="activeSection === 'zadania'">
@@ -180,6 +207,7 @@
               <span class="db-info-label">Projekt</span><span>{{ t.projekt }}</span>
               <span class="db-info-label">Program</span><span>{{ t.program }}</span>
             </div>
+
             <div class="db-section-divider">Míľniky</div>
             <div v-if="t.milniky.length" class="db-milnik-list">
               <div v-for="m in t.milniky" :key="m.id" class="db-milnik-item">
@@ -192,6 +220,20 @@
             <div class="db-invite-row" style="margin-top:0.5rem;">
               <input class="db-input" v-model="novyMilnik[t.kod]" placeholder="Názov míľnika" />
               <button class="db-btn" @click="pridatMilnik(t.kod)">Pridať</button>
+            </div>
+
+            <!-- Zápisy z konzultácií -->
+            <div class="db-section-divider">Zápisy z konzultácií</div>
+            <div v-if="t.konzultacie && t.konzultacie.length" class="db-clenovia-list">
+              <div v-for="(k, ki) in t.konzultacie" :key="ki" class="db-clen-item">
+                <span>{{ k.text }}</span>
+                <span class="db-muted">{{ k.datum }}</span>
+              </div>
+            </div>
+            <div v-else class="db-empty">Žiadne zápisy.</div>
+            <div class="db-invite-row" style="margin-top:0.5rem;">
+              <input class="db-input" v-model="novaKonzultacia[t.kod]" placeholder="Zápis z konzultácie..." />
+              <button class="db-btn" @click="pridatKonzultaciu(t.kod)">Pridať zápis</button>
             </div>
           </div>
           <div v-if="!mentorTimy.length" class="db-panel"><div class="db-empty">Nie si priradený k žiadnemu tímu.</div></div>
@@ -209,12 +251,14 @@ import { useRouter } from 'vue-router'
 import { downloadFile } from '../api.js'
 
 const MENU = [
-  { key: 'profil',     label: 'Môj profil', icon: '👤', roles: ['student','vedouci','firma','mentor'] },
-  { key: 'prihlaska',  label: 'Prihláška',  icon: '📋', roles: ['student','vedouci'] },
-  { key: 'dokumenty',  label: 'Dokumenty',  icon: '📁', roles: ['student'] },   // ← pridaj
-  { key: 'tim',        label: 'Môj tím',    icon: '👥', roles: ['vedouci'] },
-  { key: 'zadania',    label: 'Zadania',    icon: '📝', roles: ['firma'] },
-  { key: 'mentorTimy', label: 'Tímy a míľniky', icon: '🏁', roles: ['mentor'] },
+  { key: 'profil',      label: 'Môj profil',        icon: '👤', roles: ['student','vedouci','firma','mentor'] },
+  { key: 'prihlaska',   label: 'Prihláška',          icon: '📋', roles: ['student','vedouci'] },
+  { key: 'dokumenty',   label: 'Dokumenty',          icon: '📁', roles: ['student','firma'] },   // firma = tech. špecifikácia
+  { key: 'tim',         label: 'Môj tím',            icon: '👥', roles: ['vedouci'] },
+  { key: 'komunikacia', label: 'Komunikácia s NTI',  icon: '💬', roles: ['vedouci'] },
+  { key: 'zadania',     label: 'Zadania',            icon: '📝', roles: ['firma'] },
+  { key: 'rozpocet',    label: 'PO a rozpočet',      icon: '💰', roles: ['firma'] },
+  { key: 'mentorTimy',  label: 'Tímy a míľniky',     icon: '🏁', roles: ['mentor'] },
 ]
 const LABELS = { student: 'Študent', vedouci: 'Vedúci tímu', firma: 'Firma / partner', mentor: 'Mentor' }
 
@@ -247,17 +291,35 @@ export default {
       // ochrana stránky — neprihlásený ide na registráciu
       if (!userStore.isLoggedIn) { router.push('/registracia'); return }
       if (visibleMenu.value.length) activeSection.value = visibleMenu.value[0].key
-      if (role.value === 'student') dokumenty.value = await ntiStore.fetchDokumenty()
 
       // predvyplň profil z uložených údajov
       profil.meno = userStore.meno
       Object.assign(profil, userStore.profil)
 
       try {
-        if (role.value === 'student' || role.value === 'vedouci') prihlasky.value = await ntiStore.fetchPrihlasky()
-        if (role.value === 'vedouci') mojTim.value = await ntiStore.fetchMojTim()
-        if (role.value === 'mentor') mentorTimy.value = await ntiStore.fetchMentorTimy()
-        if (role.value === 'firma') zadania.value = await ntiStore.fetchZadania()
+        // ŠTUDENT
+        if (role.value === 'student') {
+          prihlasky.value = await ntiStore.fetchPrihlasky()
+          dokumenty.value = await ntiStore.fetchDokumenty()
+        }
+        // VEDÚCI
+        if (role.value === 'vedouci') {
+          prihlasky.value = await ntiStore.fetchPrihlasky()
+          mojTim.value = await ntiStore.fetchMojTim()
+          spravy.value = await ntiStore.fetchSpravy()
+        }
+        // FIRMA
+        if (role.value === 'firma') {
+          zadania.value = await ntiStore.fetchZadania()
+          dokumenty.value = await ntiStore.fetchDokumenty()
+          const r = await ntiStore.fetchRozpocet()
+          rozpocet.schvaleny = r.schvaleny || 0
+          rozpocet.cerpane = r.cerpane || 0
+        }
+        // MENTOR
+        if (role.value === 'mentor') {
+          mentorTimy.value = await ntiStore.fetchMentorTimy()
+        }
       } catch (e) { chyba.value = e.message }
     })
 
@@ -325,6 +387,45 @@ export default {
     }
     function kopirovat(kod) {
       navigator.clipboard.writeText(kod).then(() => { skopirovane.value = true; setTimeout(() => skopirovane.value = false, 1500) })
+    }
+
+    // --- VEDÚCI: KOMUNIKÁCIA ---
+    const spravy = ref([])
+    const novaSprava = ref('')
+    async function odoslatSpravu() {
+      if (!novaSprava.value.trim()) return
+      try {
+        await ntiStore.odoslatSpravu(novaSprava.value)
+        novaSprava.value = ''
+        spravy.value = await ntiStore.fetchSpravy()
+      } catch (e) { chyba.value = e.message }
+    }
+
+    // --- FIRMA: ROZPOČET ---
+    const rozpocet = reactive({ schvaleny: 0, cerpane: 0 })
+    const rozpocetUlozeny = ref(false)
+    async function ulozRozpocet() {
+      chyba.value = ''
+      try {
+        const r = await ntiStore.ulozRozpocet({ schvaleny: Number(rozpocet.schvaleny || 0), cerpane: Number(rozpocet.cerpane || 0) })
+        rozpocet.schvaleny = r.schvaleny; rozpocet.cerpane = r.cerpane
+        rozpocetUlozeny.value = true
+        setTimeout(() => rozpocetUlozeny.value = false, 2500)
+      } catch (e) { chyba.value = e.message }
+    }
+
+    // --- FIRMA: DOKUMENTY (využíva tie isté funkcie ako študent) ---
+    // nahratDokument / stiahnut / zmazatDokument už máš z predošlého kroku
+
+    // --- MENTOR: KONZULTÁCIE ---
+    const novaKonzultacia = reactive({})
+    async function pridatKonzultaciu(kod) {
+      if (!novaKonzultacia[kod]?.trim()) return
+      try {
+        await ntiStore.pridatKonzultaciu(kod, novaKonzultacia[kod])
+        novaKonzultacia[kod] = ''
+        mentorTimy.value = await ntiStore.fetchMentorTimy()
+      } catch (e) { chyba.value = e.message }
     }
 
     // --- firma: zadania ---

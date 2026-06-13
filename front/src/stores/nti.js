@@ -35,17 +35,25 @@ export const useNtiStore = defineStore('nti', {
     pridatZadanie(data)   { return api.post('/zadania', data) },
     upravitZadanie(kod, d){ return api.put(`/zadania/${kod}`, d) },
     zmazatZadanie(kod)    { return api.del(`/zadania/${kod}`) },
+    // FIRMA — rozpočet
+    fetchRozpocet()      { return api.get('/rozpocet') },
+    ulozRozpocet(data)   { return api.put('/rozpocet', data) },
 
     // VEDÚCI — tím
     fetchMojTim()             { return api.get('/timy/moj') },
     vytvoritTim(data)         { return api.post('/timy', data) },
     pridatClena(kod, clen)    { return api.post(`/timy/${kod}/clenovia`, clen) },
+    // VEDÚCI — komunikácia
+    fetchSpravy()        { return api.get('/spravy') },
+    odoslatSpravu(text)  { return api.post('/spravy', { text }) },
 
     // MENTOR — tímy a míľniky
     fetchMentorTimy()         { return api.get('/timy/mentor') },
     pripojitMentora(kod)      { return api.post(`/timy/${kod}/mentor`) },
     pridatMilnik(kod, nazov)  { return api.post(`/timy/${kod}/milniky`, { nazov }) },
     schvalitMilnik(kod, id)   { return api.patch(`/timy/${kod}/milniky/${id}`) },
+    // MENTOR — konzultácie
+    pridatKonzultaciu(kod, text) { return api.post(`/timy/${kod}/konzultacie`, { text }) },
 
     // ŠTUDENT / VEDÚCI — prihlášky
     fetchPrihlasky()          { return api.get('/prihlasky') },
