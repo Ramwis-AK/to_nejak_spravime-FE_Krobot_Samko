@@ -91,15 +91,30 @@ export const useNtiStore = defineStore('nti', {
     schvalitMilnik(kod, id)      { return api.patch(`/timy/${kod}/milniky/${id}`) },
     pridatKonzultaciu(kod, text) { return api.post(`/timy/${kod}/konzultacie`, { text }) },
 
+    // ====================================================
     // ADMIN — výzvy
+    // ====================================================
     pridatVyzvu(d)      { return api.post('/vyzvy', d) },
     upravitVyzvu(id, d) { return api.put(`/vyzvy/${id}`, d) },
     zmazatVyzvu(id)     { return api.del(`/vyzvy/${id}`) },
+
+    // ====================================================
     // ADMIN — prihlášky + audit
+    // ====================================================
     fetchVsetkyPrihlasky()       { return api.get('/admin/prihlasky') },
     zmenStavPrihlasky(id, stav)  { return api.patch(`/admin/prihlasky/${id}/stav`, { stav }) },
     fetchAudit()                 { return api.get('/admin/audit') },
+
+    // ====================================================
+    // ADMIN — novinky
+    // ====================================================
+    pridatNovinku(d)      { return api.post('/novinky', d) },
+    upravitNovinku(id, d) { return api.put(`/novinky/${id}`, d) },
+    zmazatNovinku(id)     { return api.del(`/novinky/${id}`) },
+
+    // ====================================================
     // KOMISIA
+    // ====================================================
     fetchKomisiaPrihlasky()      { return api.get('/komisia/prihlasky') },
     hodnotitPrihlasku(id, data)  { return api.patch(`/komisia/prihlasky/${id}`, data) },
   },

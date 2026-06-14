@@ -8,7 +8,6 @@
       <h1>{{ novinka.titul }}</h1>
       <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:2rem;">{{ novinka.datum }}</p>
       <p style="font-size:1rem;color:#374151;line-height:1.8;margin-bottom:2rem;">{{ novinka.perex }}</p>
-      <p class="placeholder-note">Plný obsah článku bude dostupný po napojení na CMS backend.</p>
     </div>
     <div v-else class="detail-page">
       <RouterLink to="/novinky" class="back-btn">← Späť</RouterLink>

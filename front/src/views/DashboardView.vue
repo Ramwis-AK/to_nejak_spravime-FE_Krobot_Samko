@@ -321,6 +321,31 @@
           <div v-else class="db-empty">Žiadne záznamy.</div>
         </div>
 
+                <!-- ADMIN — NOVINKY (CRUD) -->
+        <div v-else-if="activeSection === 'admin_novinky'">
+          <div class="db-panel" style="margin-bottom:1rem;">
+            <h3>{{ editNovinkaId ? 'Upraviť novinku' : 'Pridať novinku' }}</h3>
+            <div class="db-form-group"><label>Titul</label><input class="db-input" v-model="novinkaForm.titul" /></div>
+            <div class="db-form-group"><label>Dátum</label><input class="db-input" type="date" v-model="novinkaForm.datum" /></div>
+            <div class="db-form-group"><label>Kategória</label><input class="db-input" v-model="novinkaForm.kategoria" placeholder="Oznámenie, Udalosť..." /></div>
+            <div class="db-form-group"><label>Perex (krátky úvod)</label><textarea class="db-input" v-model="novinkaForm.perex" rows="2" /></div>
+            <div class="db-form-group"><label>Obsah</label><textarea class="db-input" v-model="novinkaForm.obsah" rows="4" /></div>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="db-btn" @click="ulozNovinku">{{ editNovinkaId ? 'Uložiť' : 'Pridať' }}</button>
+              <button v-if="editNovinkaId" class="db-btn-outline" @click="editNovinkaId = null">Zrušiť</button>
+            </div>
+          </div>
+          <div v-for="n in novinkyList" :key="n.id" class="db-zadanie-card">
+            <div class="db-zadanie-header"><strong>{{ n.titul }}</strong><span class="db-badge grey">{{ n.kategoria }}</span></div>
+            <p style="font-size:0.85rem;color:#64748b;">{{ n.datum }} — {{ n.perex }}</p>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="db-btn-sm-outline" @click="upravitNovinku(n)">Upraviť</button>
+              <button class="db-btn-danger" @click="zmazatNovinku(n.id)">Zmazať</button>
+            </div>
+          </div>
+        </div>
+        
+
         <!-- ===================== KOMISIA — HODNOTENIE PROGRAMU A ===================== -->
         <div v-else-if="activeSection === 'komisia'">
           <div v-if="komisiaPrihlasky.length">
@@ -368,11 +393,11 @@ const MENU = [
   { key: 'rozpocet',        label: 'PO a rozpočet',  icon: '💰', roles: ['firma'] },
   { key: 'prihlasky_firma', label: 'Prihlášky',      icon: '📨', roles: ['firma'] },
   { key: 'mentorTimy',      label: 'Tímy a míľniky', icon: '🏁', roles: ['mentor'] },
-  { key: 'admin_vyzvy',     label: 'Výzvy',      icon: '📅', roles: ['admin'] },
-  { key: 'admin_prihlasky', label: 'Prihlášky',  icon: '📨', roles: ['admin'] },
-  { key: 'admin_audit',     label: 'Audit log',  icon: '🛡️', roles: ['admin'] },
-  { key: 'komisia',         label: 'Hodnotenie', icon: '⚖️', roles: ['komisia'] },
-
+  { key: 'admin_vyzvy',     label: 'Výzvy',          icon: '📅', roles: ['admin'] },
+  { key: 'admin_prihlasky', label: 'Prihlášky',      icon: '📨', roles: ['admin'] },
+  { key: 'admin_audit',     label: 'Audit log',      icon: '🛡️', roles: ['admin'] },
+  { key: 'admin_novinky',   label: 'Novinky',        icon: '📰', roles: ['admin'] },
+  { key: 'komisia',         label: 'Hodnotenie',     icon: '⚖️', roles: ['komisia'] },
 ]
 
 const LABELS = { student: 'Študent', firma: 'Firma / partner', mentor: 'Mentor', admin: 'NTI administrátor', komisia: 'Komisia' }
@@ -573,7 +598,7 @@ export default {
       catch (e) { mentorChyba.value = e.message }
     }
 
-        // ADMIN — výzvy
+    // ADMIN — výzvy
     const vyzvy = ref([])
     const vyzvaForm = reactive({ nazov: '', program: 'Program A', popis: '', deadline: '', stav: 'Otvorená' })
     const editVyzvaId = ref(null)
@@ -600,6 +625,30 @@ export default {
     const audit = ref([])
     async function zmenStav(id, stav) {
       try { await ntiStore.zmenStavPrihlasky(id, stav); vsetkyPrihlasky.value = await ntiStore.fetchVsetkyPrihlasky() }
+      catch (e) { chyba.value = e.message }
+    }
+
+    // ADMIN — novinky
+    const novinkyList = ref([])
+    const novinkaForm = reactive({ titul: '', datum: '', perex: '', kategoria: '', obsah: '' })
+    const editNovinkaId = ref(null)
+    function resetNovinka() { Object.assign(novinkaForm, { titul: '', datum: '', perex: '', kategoria: '', obsah: '' }) }
+    async function ulozNovinku() {
+      chyba.value = ''
+      if (!novinkaForm.titul.trim() || !novinkaForm.datum) { chyba.value = 'Vyplň titul a dátum.'; return }
+      try {
+        if (editNovinkaId.value) await ntiStore.upravitNovinku(editNovinkaId.value, { ...novinkaForm })
+        else await ntiStore.pridatNovinku({ ...novinkaForm })
+        editNovinkaId.value = null; resetNovinka()
+        await ntiStore.fetchNovinky(); novinkyList.value = ntiStore.novinky
+      } catch (e) { chyba.value = e.message }
+    }
+    function upravitNovinku(n) {
+      editNovinkaId.value = n.id
+      Object.assign(novinkaForm, { titul: n.titul, datum: n.datum, perex: n.perex, kategoria: n.kategoria, obsah: n.obsah || '' })
+    }
+    async function zmazatNovinku(id) {
+      try { await ntiStore.zmazatNovinku(id); await ntiStore.fetchNovinky(); novinkyList.value = ntiStore.novinky }
       catch (e) { chyba.value = e.message }
     }
 
@@ -644,6 +693,7 @@ export default {
         }
         if (role.value === 'admin') {
           await ntiStore.fetchVyzvy(); vyzvy.value = ntiStore.vyzvy
+          await ntiStore.fetchNovinky(); novinkyList.value = ntiStore.novinky
           vsetkyPrihlasky.value = await ntiStore.fetchVsetkyPrihlasky()
           audit.value = await ntiStore.fetchAudit()
         }
@@ -671,7 +721,11 @@ export default {
       
       vyzvy, vyzvaForm, editVyzvaId, ulozVyzvu, upravitVyzvu, zmazatVyzvu,
       vsetkyPrihlasky, zmenStav, audit,
+      novinkyList, novinkaForm, editNovinkaId, ulozNovinku, upravitNovinku, zmazatNovinku,
+
       komisiaPrihlasky, hodnotenie, hodnotit,
+
+      
     }
   }
 }
