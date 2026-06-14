@@ -15,7 +15,7 @@ export const useNtiStore = defineStore('nti', {
     // statické metadáta rolí (pre registráciu)
     roles: [
       { key: 'student', name: 'Študent', desc: 'Jednotlivec uchádzajúci sa o program alebo zakladajúci tím' },
-      { key: 'firma',   name: 'Firma / partner', desc: 'Organizácia zadávajúca výzvu alebo vstupujúca do programu B' },
+      { key: 'firma',   name: 'Firma / Partner / Startup', desc: 'Zakladatelia Program A Program B' },
       { key: 'mentor',  name: 'Mentor', desc: 'Osoba sprevádzajúca projekt alebo tím' },
     ],
   }),

@@ -24,10 +24,6 @@
           <p><strong>Telefón:</strong> {{ prax.kontaktTel ?? '—' }}</p>
         </div>
       </div>
-
-      <div v-if="userStore.isLoggedIn && prax.stavKey === 'open'" style="margin-top:1.5rem;">
-        <RouterLink to="/dashboard" class="btn-primary">Prihlásiť tím na toto zadanie →</RouterLink>
-      </div>
     </div>
     <div v-else class="detail-page">
       <RouterLink to="/prax" class="back-btn">← Späť</RouterLink>
