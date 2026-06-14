@@ -131,16 +131,22 @@
           </div>
         </div>
 
-        <!-- ===================== FIRMA — ZADANIA (CRUD) ===================== -->
+                <!-- ===================== FIRMA — ZADANIA (CRUD) ===================== -->
         <div v-else-if="activeSection === 'zadania'">
           <div class="db-panel" style="margin-bottom:1rem;">
             <h3>{{ editKod ? 'Upraviť zadanie' : 'Pridať zadanie' }}</h3>
+            <div class="db-form-group"><label>Program</label>
+              <select class="db-input" v-model="zadanieForm.program" :disabled="editKod">
+                <option value="A">Program A — Startup</option>
+                <option value="B">Program B — Zadanie</option>
+              </select>
+            </div>
             <div class="db-form-group"><label>Názov</label><input class="db-input" v-model="zadanieForm.nazov" type="text" /></div>
-            <div class="db-form-group"><label>Sektor</label><input class="db-input" v-model="zadanieForm.sektor" type="text" /></div>
+            <div class="db-form-group"><label>Sektor / oblasť</label><input class="db-input" v-model="zadanieForm.sektor" type="text" /></div>
             <div class="db-form-group"><label>Lokalita</label><input class="db-input" v-model="zadanieForm.lokalita" type="text" /></div>
-            <div class="db-form-group"><label>Odmena</label><input class="db-input" v-model="zadanieForm.odmena" type="text" /></div>
+            <div class="db-form-group"><label>Odmena / investícia</label><input class="db-input" v-model="zadanieForm.odmena" type="text" /></div>
             <div class="db-form-group"><label>Popis</label><textarea class="db-input" v-model="zadanieForm.popis" rows="3" /></div>
-            <div class="db-form-group"><label>Stav</label>
+            <div class="db-form-group" v-if="zadanieForm.program === 'B'"><label>Stav</label>
               <select class="db-input" v-model="zadanieForm.stav">
                 <option>Otvorené</option><option>Párovanie</option><option>V realizácii</option><option>Uzavreté</option>
               </select>
@@ -154,7 +160,10 @@
             <div v-for="z in zadania" :key="z.kod" class="db-zadanie-card">
               <div class="db-zadanie-header">
                 <strong>{{ z.nazov }}</strong>
-                <span class="db-kod-inline">{{ z.kod }}</span>
+                <span style="display:flex;gap:0.4rem;align-items:center;">
+                  <span class="db-badge grey">Program {{ z.program }}</span>
+                  <span class="db-kod-inline">{{ z.kod }}</span>
+                </span>
               </div>
               <p style="font-size:0.85rem;color:#64748b;">{{ z.popis }}</p>
               <div style="display:flex;gap:0.5rem;">
@@ -493,9 +502,9 @@ export default {
     // FIRMA — ZADANIA (CRUD)
     // ====================================================
     const zadania = ref([])
-    const zadanieForm = reactive({ nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' })
+    const zadanieForm = reactive({ program: 'B', nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' })
     const editKod = ref(null)
-    function resetForm() { Object.assign(zadanieForm, { nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' }) }
+    function resetForm() { Object.assign(zadanieForm, { program: 'B', nazov: '', sektor: '', lokalita: '', odmena: '', popis: '', stav: 'Otvorené' }) }
     async function ulozZadanie() {
       chyba.value = ''
       if (!zadanieForm.nazov.trim()) { chyba.value = 'Vyplň názov.'; return }
